@@ -2,17 +2,10 @@ import React from 'react';
 import { 
   Factory, 
   ShoppingCart, 
-  AlertTriangle, 
   CheckCircle2, 
-  TrendingUp, 
-  IndianRupee, 
-  Boxes,
-  ArrowUpRight,
+  ChevronRight,
   ArrowRight,
-  Clock,
-  Sparkles,
-  Layers,
-  ChevronRight
+  Plus
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
 import { NavTab } from '../layout/Sidebar';
@@ -51,178 +44,128 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ onNaviga
   const gstLiability = chartOfAccounts.find(c => c.accountCode === '2020')?.balance || 142000;
 
   const lowStockCount = items.filter(i => i.currentStock <= i.reorderLevel).length;
-  const pendingQC = qualityInspections.filter(q => q.status !== 'passed').length + workOrders.filter(w => w.status === 'qc_pending').length;
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner / Plant Welcome */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-1 p-6 rounded-2xl border border-hairline shadow-card">
+    <div className="space-y-8">
+      {/* Editorial Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-fin-orange uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-fin-orange animate-ping" />
-            Live Plant Operational Overview
+          <div className="text-sm font-medium text-ink-muted">
+            Operations overview
           </div>
-          <h1 className="text-2xl font-bold text-ink tracking-tight mt-1">
+          <h1 className="text-3xl font-medium text-ink tracking-[-0.8px] mt-1">
             {activeCompany.name}
           </h1>
-          <p className="text-xs text-ink-muted mt-0.5">
-            {activeCompany.industry} · {activeCompany.city}, {activeCompany.state} (GSTIN: {activeCompany.gstin})
+          <p className="text-xs text-ink-muted mt-1">
+            {activeCompany.city}, {activeCompany.state} · GSTIN {activeCompany.gstin}
           </p>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Quiet, Professional Primary Actions */}
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={() => onNavigate('sales')}
-            className="px-3.5 py-2 rounded-md bg-ink hover:bg-black text-white text-xs font-semibold transition-colors flex items-center gap-1.5"
+            className="btn-secondary text-xs"
           >
             <ShoppingCart className="w-3.5 h-3.5" />
-            New Sales Order
+            <span>New sales order</span>
           </button>
           <button
             onClick={() => onNavigate('manufacturing')}
-            className="px-3.5 py-2 rounded-md bg-surface-1 border border-hairline hover:border-ink text-ink text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-card"
+            className="btn-primary text-xs"
           >
-            <Factory className="w-3.5 h-3.5" />
-            New Work Order
-          </button>
-          <button
-            onClick={onOpenMRP}
-            className="px-3.5 py-2 rounded-md bg-fin-orange hover:bg-fin-orangeHover text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
-          >
-            <Layers className="w-3.5 h-3.5" />
-            Run MRP Engine
+            <Plus className="w-3.5 h-3.5" />
+            <span>New work order</span>
           </button>
         </div>
       </div>
 
-      {/* Primary KPI Grid (Lift onto White Cards) */}
+      {/* Primary Lifted Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Today's Production Output */}
-        <div className="bg-surface-1 p-5 rounded-xl border border-hairline shadow-card relative overflow-hidden">
-          <div className="flex items-center justify-between text-ink-subtle text-xs font-medium">
-            <span>Shop-Floor Output</span>
-            <Factory className="w-4 h-4 text-report-blue" />
+        {/* Output */}
+        <div className="bg-surface-1 p-5 rounded-lg border border-hairline">
+          <div className="text-xs font-normal text-ink-muted">
+            Today's production output
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div className="text-2xl font-bold text-ink">
-              {completedToday} <span className="text-xs font-normal text-ink-subtle">nos</span>
-            </div>
-            <span className="text-xs font-semibold text-report-green bg-green-50 px-1.5 py-0.5 rounded">
-              {productionRate}% of plan
-            </span>
+          <div className="mt-2 text-3xl font-medium tracking-tight text-ink">
+            {completedToday} <span className="text-xs font-normal text-ink-muted">/ {totalPlannedToday} nos</span>
           </div>
-          <div className="mt-3 w-full bg-surface-2 rounded-full h-1.5 overflow-hidden">
-            <div 
-              className="bg-report-blue h-full rounded-full transition-all duration-500" 
-              style={{ width: `${Math.min(productionRate, 100)}%` }} 
-            />
-          </div>
-          <div className="mt-2 text-[11px] text-ink-muted flex justify-between">
-            <span>Target: {totalPlannedToday} nos</span>
+          <div className="mt-3 flex items-center justify-between text-xs text-ink-muted pt-2 border-t border-hairline-soft">
+            <span>Progress: {productionRate}%</span>
             <span>{activeWorkOrders.length} active jobs</span>
           </div>
         </div>
 
-        {/* Pending Orders & Pipeline */}
-        <div className="bg-surface-1 p-5 rounded-xl border border-hairline shadow-card">
-          <div className="flex items-center justify-between text-ink-subtle text-xs font-medium">
-            <span>Pending Sales Orders</span>
-            <ShoppingCart className="w-4 h-4 text-report-green" />
+        {/* Sales */}
+        <div className="bg-surface-1 p-5 rounded-lg border border-hairline">
+          <div className="text-xs font-normal text-ink-muted">
+            Confirmed sales orders
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div className="text-2xl font-bold text-ink">
-              {pendingSalesCount} <span className="text-xs font-normal text-ink-subtle">orders</span>
-            </div>
-            <span className="text-xs font-semibold text-ink bg-surface-2 px-1.5 py-0.5 rounded">
-              Active Lots
-            </span>
+          <div className="mt-2 text-3xl font-medium tracking-tight text-ink">
+            {pendingSalesCount} <span className="text-xs font-normal text-ink-muted">orders</span>
           </div>
-          <div className="mt-3 text-[11px] text-ink-muted flex items-center justify-between pt-1 border-t border-hairline-soft">
-            <span>Total Sales Value</span>
-            <span className="font-semibold text-ink font-mono">₹{totalSalesRevenue.toLocaleString('en-IN')}</span>
+          <div className="mt-3 flex items-center justify-between text-xs text-ink-muted pt-2 border-t border-hairline-soft">
+            <span>Total order value</span>
+            <span className="font-mono text-ink">₹{totalSalesRevenue.toLocaleString('en-IN')}</span>
           </div>
-          <button
-            onClick={() => onNavigate('sales')}
-            className="mt-2 text-[11px] font-medium text-fin-orange hover:underline flex items-center gap-1"
-          >
-            Review customer orders <ArrowRight className="w-3 h-3" />
-          </button>
         </div>
 
-        {/* Critical Shortages & Low Stock */}
-        <div className="bg-surface-1 p-5 rounded-xl border border-hairline shadow-card">
-          <div className="flex items-center justify-between text-ink-subtle text-xs font-medium">
-            <span>Material Shortages (MRP)</span>
-            <AlertTriangle className="w-4 h-4 text-fin-orange" />
+        {/* Shortages */}
+        <div className="bg-surface-1 p-5 rounded-lg border border-hairline">
+          <div className="text-xs font-normal text-ink-muted">
+            Material shortages (MRP)
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div className="text-2xl font-bold text-fin-orange">
-              {criticalShortagesCount} <span className="text-xs font-normal text-ink-subtle">items</span>
-            </div>
-            {criticalShortagesCount > 0 ? (
-              <span className="text-xs font-bold text-fin-orange bg-fin-orangeLight px-1.5 py-0.5 rounded">
-                Action Required
-              </span>
-            ) : (
-              <span className="text-xs font-semibold text-report-green bg-green-50 px-1.5 py-0.5 rounded">
-                Stock OK
-              </span>
-            )}
+          <div className="mt-2 text-3xl font-medium tracking-tight text-ink flex items-baseline gap-2">
+            <span className={criticalShortagesCount > 0 ? 'text-fin-orange' : 'text-ink'}>
+              {criticalShortagesCount}
+            </span>
+            <span className="text-xs font-normal text-ink-muted">items</span>
           </div>
-          <div className="mt-3 text-[11px] text-ink-muted flex items-center justify-between pt-1 border-t border-hairline-soft">
-            <span>Low Stock Reorders</span>
-            <span className="font-semibold text-ink">{lowStockCount} items</span>
+          <div className="mt-3 flex items-center justify-between text-xs text-ink-muted pt-2 border-t border-hairline-soft">
+            <span>Low stock alert: {lowStockCount}</span>
+            <button 
+              onClick={onOpenMRP}
+              className="text-fin-orange hover:underline font-medium"
+            >
+              Run MRP
+            </button>
           </div>
-          <button
-            onClick={onOpenMRP}
-            className="mt-2 text-[11px] font-medium text-fin-orange hover:underline flex items-center gap-1"
-          >
-            Explode BOM & Auto-PO <ArrowRight className="w-3 h-3" />
-          </button>
         </div>
 
-        {/* Quality & Pass Rate */}
-        <div className="bg-surface-1 p-5 rounded-xl border border-hairline shadow-card">
-          <div className="flex items-center justify-between text-ink-subtle text-xs font-medium">
-            <span>Quality Inspection Lock</span>
-            <CheckCircle2 className="w-4 h-4 text-report-pink" />
+        {/* Quality */}
+        <div className="bg-surface-1 p-5 rounded-lg border border-hairline">
+          <div className="text-xs font-normal text-ink-muted">
+            Quality acceptance rate
           </div>
-          <div className="mt-2 flex items-baseline justify-between">
-            <div className="text-2xl font-bold text-ink">
-              98.2% <span className="text-xs font-normal text-ink-subtle">Pass Rate</span>
-            </div>
-            <span className="text-xs font-semibold text-report-green bg-green-50 px-1.5 py-0.5 rounded">
-              PPM &lt; 50
-            </span>
+          <div className="mt-2 text-3xl font-medium tracking-tight text-ink">
+            98.2% <span className="text-xs font-normal text-ink-muted">pass</span>
           </div>
-          <div className="mt-3 text-[11px] text-ink-muted flex items-center justify-between pt-1 border-t border-hairline-soft">
-            <span>Pending QC Inspections</span>
-            <span className="font-semibold text-ink">{pendingQC} lots</span>
+          <div className="mt-3 flex items-center justify-between text-xs text-ink-muted pt-2 border-t border-hairline-soft">
+            <span>Rejections &lt; 2%</span>
+            <button 
+              onClick={() => onNavigate('quality')}
+              className="text-ink hover:underline font-medium"
+            >
+              Inspection log
+            </button>
           </div>
-          <button
-            onClick={() => onNavigate('quality')}
-            className="mt-2 text-[11px] font-medium text-ink hover:text-fin-orange transition-colors flex items-center gap-1"
-          >
-            Open QC inspection queue <ArrowRight className="w-3 h-3" />
-          </button>
         </div>
       </div>
 
-      {/* Middle Row: Active Work Orders & Financial Summary */}
+      {/* Active Work Orders & Financial Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Active Production Work Orders (2 Columns) */}
-        <div className="lg:col-span-2 bg-surface-1 rounded-xl border border-hairline shadow-card overflow-hidden">
+        {/* Active Production List (2 Columns) */}
+        <div className="lg:col-span-2 bg-surface-1 rounded-lg border border-hairline">
           <div className="px-5 py-4 border-b border-hairline flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-ink">Active Shop-Floor Production Jobs</h3>
-              <p className="text-[11px] text-ink-muted">Real-time status of work orders running in CNC & assembly cells</p>
+              <h2 className="text-sm font-medium text-ink">Active production work orders</h2>
+              <p className="text-xs text-ink-muted">Real-time status of shop-floor machine jobs</p>
             </div>
             <button
               onClick={() => onNavigate('manufacturing')}
-              className="text-xs font-medium text-ink-muted hover:text-ink flex items-center gap-1"
+              className="text-xs text-ink-muted hover:text-ink flex items-center gap-1 font-medium"
             >
-              View All <ChevronRight className="w-3.5 h-3.5" />
+              View all <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -230,39 +173,28 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ onNaviga
             {workOrders.slice(0, 4).map((wo) => {
               const progress = Math.round((wo.producedQuantity / wo.plannedQuantity) * 100);
               return (
-                <div key={wo.id} className="p-4 hover:bg-canvas/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="space-y-1">
+                <div key={wo.id} className="p-4 hover:bg-canvas/50 transition-colors flex items-center justify-between">
+                  <div className="space-y-0.5">
                     <div className="flex items-center space-x-2">
-                      <span className="font-mono font-semibold text-xs text-ink">{wo.woNumber}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                        wo.priority === 'urgent' ? 'bg-red-100 text-red-700' : 'bg-surface-2 text-ink-muted'
-                      }`}>
-                        {wo.priority}
-                      </span>
-                      <span className="text-xs font-semibold text-ink truncate max-w-xs">{wo.productName}</span>
+                      <span className="font-mono text-xs font-medium text-ink">{wo.woNumber}</span>
+                      <span className="text-xs font-medium text-ink">{wo.productName}</span>
                     </div>
-                    <div className="text-[11px] text-ink-subtle flex items-center gap-3">
-                      <span>Supervisor: {wo.assignedSupervisor}</span>
-                      <span>•</span>
-                      <span>Worker: {wo.assignedWorker}</span>
-                      <span>•</span>
-                      <span>Due: {wo.dueDate}</span>
+                    <div className="text-xs text-ink-muted">
+                      Operator: {wo.assignedWorker} · Due: {wo.dueDate}
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <div className="text-xs font-bold text-ink">
+                  <div className="text-right flex items-center space-x-4">
+                    <div>
+                      <div className="text-xs font-mono font-medium text-ink">
                         {wo.producedQuantity} / {wo.plannedQuantity}
                       </div>
-                      <div className="text-[10px] text-ink-muted">{progress}% Complete</div>
+                      <div className="text-[11px] text-ink-muted">{progress}%</div>
                     </div>
-                    <div className="w-20 bg-surface-2 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          wo.status === 'completed' ? 'bg-report-green' : 'bg-fin-orange'
-                        }`}
-                        style={{ width: `${Math.min(progress, 100)}%` }}
+                    <div className="w-16 bg-surface-2 rounded-full h-1.5 overflow-hidden hidden sm:block">
+                      <div 
+                        className="bg-ink h-full rounded-full" 
+                        style={{ width: `${Math.min(progress, 100)}%` }} 
                       />
                     </div>
                   </div>
@@ -272,57 +204,40 @@ export const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({ onNaviga
           </div>
         </div>
 
-        {/* Financial & GST Snapshot (1 Column) */}
-        <div className="bg-surface-1 rounded-xl border border-hairline shadow-card p-5 space-y-4">
+        {/* Financial & GST Ledger Summary (1 Column) */}
+        <div className="bg-surface-1 rounded-lg border border-hairline p-5 space-y-4">
           <div className="border-b border-hairline pb-3">
-            <h3 className="text-sm font-semibold text-ink flex items-center gap-1.5">
-              <IndianRupee className="w-4 h-4 text-report-green" />
-              Financial & GST Position
-            </h3>
-            <p className="text-[11px] text-ink-muted">Double-entry ledger summary & tax liability</p>
+            <h2 className="text-sm font-medium text-ink">Financial & tax position</h2>
+            <p className="text-xs text-ink-muted">Double-entry ledger balances</p>
           </div>
 
-          <div className="space-y-3">
-            <div className="p-3 rounded-lg bg-surface-2/40 border border-hairline-soft flex items-center justify-between">
-              <span className="text-xs text-ink-muted">Liquid Cash & Bank (SBI / HDFC)</span>
-              <span className="text-xs font-bold font-mono text-ink">
-                ₹{bankBalance.toLocaleString('en-IN')}
-              </span>
+          <div className="space-y-2.5 text-xs">
+            <div className="p-2.5 rounded bg-canvas border border-hairline-soft flex items-center justify-between">
+              <span className="text-ink-muted">Cash & bank balance</span>
+              <span className="font-mono font-medium text-ink">₹{bankBalance.toLocaleString('en-IN')}</span>
             </div>
 
-            <div className="p-3 rounded-lg bg-surface-2/40 border border-hairline-soft flex items-center justify-between">
-              <div>
-                <div className="text-xs text-ink-muted">Trade Receivables (Debtors)</div>
-                <div className="text-[10px] text-ink-subtle">Tata Motors, Mahindra, Bajaj</div>
-              </div>
-              <span className="text-xs font-bold font-mono text-report-blue">
-                ₹{debtorsBalance.toLocaleString('en-IN')}
-              </span>
+            <div className="p-2.5 rounded bg-canvas border border-hairline-soft flex items-center justify-between">
+              <span className="text-ink-muted">Trade receivables (Debtors)</span>
+              <span className="font-mono font-medium text-ink">₹{debtorsBalance.toLocaleString('en-IN')}</span>
             </div>
 
-            <div className="p-3 rounded-lg bg-surface-2/40 border border-hairline-soft flex items-center justify-between">
-              <span className="text-xs text-ink-muted">Trade Payables (Suppliers)</span>
-              <span className="text-xs font-bold font-mono text-ink">
-                ₹{creditorsBalance.toLocaleString('en-IN')}
-              </span>
+            <div className="p-2.5 rounded bg-canvas border border-hairline-soft flex items-center justify-between">
+              <span className="text-ink-muted">Trade payables (Creditors)</span>
+              <span className="font-mono font-medium text-ink">₹{creditorsBalance.toLocaleString('en-IN')}</span>
             </div>
 
-            <div className="p-3 rounded-lg bg-red-50/50 border border-red-100 flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-ink">GST Liability (GSTR-3B)</div>
-                <div className="text-[10px] text-red-600">Net Payable after ITC</div>
-              </div>
-              <span className="text-xs font-bold font-mono text-red-700">
-                ₹{gstLiability.toLocaleString('en-IN')}
-              </span>
+            <div className="p-2.5 rounded bg-canvas border border-hairline-soft flex items-center justify-between">
+              <span className="text-ink-muted">Net GST liability (GSTR-3B)</span>
+              <span className="font-mono font-medium text-ink">₹{gstLiability.toLocaleString('en-IN')}</span>
             </div>
           </div>
 
           <button
             onClick={() => onNavigate('finance')}
-            className="w-full py-2 text-center text-xs font-semibold text-ink hover:bg-surface-2 rounded-md border border-hairline transition-colors"
+            className="w-full py-2 text-center text-xs font-medium text-ink hover:bg-surface-2 rounded-md border border-hairline transition-colors"
           >
-            Open Full Accounting & GST Reports
+            Review accounting ledger
           </button>
         </div>
       </div>

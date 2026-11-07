@@ -16,7 +16,8 @@ import {
   Invoice,
   Payment,
   ChartOfAccount,
-  DeliveryChallan
+  DeliveryChallan,
+  Quotation
 } from '../types/erp';
 
 export const INITIAL_COMPANIES: Company[] = [

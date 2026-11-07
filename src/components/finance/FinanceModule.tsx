@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 import { 
-  FileSpreadsheet, 
   Plus, 
   Search, 
-  Receipt, 
-  IndianRupee, 
-  CheckCircle2, 
   Printer, 
   Download, 
-  Building,
-  CreditCard,
-  QrCode,
   X
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
-import { Invoice, Payment } from '../../types/erp';
+import { Invoice } from '../../types/erp';
 
 export const FinanceModule: React.FC = () => {
   const { 
@@ -32,7 +25,6 @@ export const FinanceModule: React.FC = () => {
   const [selectedInvoiceToPrint, setSelectedInvoiceToPrint] = useState<Invoice | null>(null);
 
   // New Payment State
-  const [partnerType, setPartnerType] = useState<'customer_receipt' | 'supplier_payment'>('customer_receipt');
   const [partnerId, setPartnerId] = useState('');
   const [paymentAmount, setPaymentAmount] = useState(50000);
   const [paymentMode, setPaymentMode] = useState('bank_transfer_neft_rtgs');
@@ -43,7 +35,6 @@ export const FinanceModule: React.FC = () => {
     inv.partnerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // GST calculations
   const totalTaxable = invoices.reduce((acc, i) => acc + i.subtotal, 0);
   const totalCGST = invoices.reduce((acc, i) => acc + i.cgstAmount, 0);
   const totalSGST = invoices.reduce((acc, i) => acc + i.sgstAmount, 0);
@@ -54,7 +45,7 @@ export const FinanceModule: React.FC = () => {
     e.preventDefault();
     const customer = customers.find(c => c.id === partnerId);
     recordPayment(
-      partnerType,
+      'customer_receipt',
       partnerId,
       customer?.name || 'Customer Partner',
       paymentAmount,
@@ -71,59 +62,48 @@ export const FinanceModule: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-ink flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-report-green" />
-            Finance, GST & Invoicing
+          <div className="text-sm font-medium text-ink-muted">Financial ledger & tax compliance</div>
+          <h1 className="text-2xl font-medium text-ink tracking-tight mt-0.5">
+            Finance & GST accounts
           </h1>
-          <p className="text-xs text-ink-muted">
-            Indian GST compliance (GSTR-1 / GSTR-3B), e-Invoicing, double-entry General Ledger & receivable/payable aging
-          </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <div className="flex bg-surface-1 border border-hairline rounded-lg p-0.5 shadow-card">
+        <div className="flex items-center space-x-3">
+          <div className="pill-container">
             <button
               onClick={() => setActiveTab('invoices')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'invoices' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
+              className={`pill-item ${activeTab === 'invoices' ? 'pill-item-active' : ''}`}
             >
-              Tax Invoices
+              Tax invoices
             </button>
             <button
               onClick={() => setActiveTab('gst')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'gst' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
+              className={`pill-item ${activeTab === 'gst' ? 'pill-item-active' : ''}`}
             >
-              GST Returns (1 & 3B)
+              GST returns
             </button>
             <button
               onClick={() => setActiveTab('payments')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'payments' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
+              className={`pill-item ${activeTab === 'payments' ? 'pill-item-active' : ''}`}
             >
-              Receipts & Vouchers
+              Receipts
             </button>
             <button
               onClick={() => setActiveTab('ledger')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'ledger' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
+              className={`pill-item ${activeTab === 'ledger' ? 'pill-item-active' : ''}`}
             >
-              General Ledger
+              Ledger
             </button>
           </div>
 
           <button
             onClick={() => setIsPaymentModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-ink hover:bg-black text-white text-xs font-semibold rounded-md transition-colors"
+            className="btn-primary text-xs"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Record Payment</span>
+            <span>Record payment</span>
           </button>
         </div>
       </div>
@@ -131,71 +111,62 @@ export const FinanceModule: React.FC = () => {
       {activeTab === 'invoices' && (
         <div className="space-y-4">
           <div className="relative max-w-sm">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-ink-muted" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-ink-subtle" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search invoices by #, partner..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-subtle focus:outline-none focus:border-ink"
+              placeholder="Search by invoice # or partner..."
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-tertiary focus:outline-none focus:border-ink transition-colors"
             />
           </div>
 
-          <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
+          <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-surface-2/40 border-b border-hairline text-ink font-semibold">
+                <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                   <tr>
                     <th className="px-4 py-3">Invoice #</th>
-                    <th className="px-4 py-3">Customer / Partner</th>
+                    <th className="px-4 py-3">Customer</th>
                     <th className="px-3 py-3">GSTIN</th>
                     <th className="px-3 py-3">Date</th>
                     <th className="px-4 py-3 text-right">Taxable</th>
-                    <th className="px-4 py-3 text-right">CGST + SGST (18%)</th>
-                    <th className="px-4 py-3 text-right font-bold">Total (₹)</th>
+                    <th className="px-4 py-3 text-right">GST (18%)</th>
+                    <th className="px-4 py-3 text-right font-medium text-ink">Total</th>
                     <th className="px-3 py-3">Status</th>
                     <th className="px-4 py-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-hairline-soft">
+                <tbody className="divide-y divide-hairline-soft font-normal">
                   {filteredInvoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-canvas/50 transition-colors">
-                      <td className="px-4 py-3 font-mono font-semibold text-ink">
+                    <tr key={inv.id} className="hover:bg-canvas/40 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-ink">
                         {inv.invoiceNumber}
-                        {inv.gstIrn && (
-                          <div className="text-[9px] text-report-green font-mono">e-Invoice IRN Active</div>
-                        )}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-ink">
+                      <td className="px-4 py-3 font-medium text-ink">
                         {inv.partnerName}
                       </td>
                       <td className="px-3 py-3 font-mono text-ink-muted">{inv.partnerGstin}</td>
                       <td className="px-3 py-3 text-ink-muted">{inv.invoiceDate}</td>
-                      <td className="px-4 py-3 text-right font-mono text-ink">
+                      <td className="px-4 py-3 text-right font-mono text-ink-muted">
                         ₹{inv.subtotal.toLocaleString('en-IN')}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-ink-muted">
                         ₹{(inv.cgstAmount + inv.sgstAmount).toLocaleString('en-IN')}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono font-bold text-ink">
+                      <td className="px-4 py-3 text-right font-mono font-medium text-ink">
                         ₹{inv.totalAmount.toLocaleString('en-IN')}
                       </td>
-                      <td className="px-3 py-3">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                          inv.status === 'paid'
-                            ? 'bg-green-100 text-report-green'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}>
-                          {inv.status}
-                        </span>
+                      <td className="px-3 py-3 capitalize text-ink-muted">
+                        {inv.status}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button
                           onClick={() => setSelectedInvoiceToPrint(inv)}
-                          className="px-2.5 py-1 text-[11px] font-medium text-ink bg-surface-1 border border-hairline hover:border-ink rounded transition-colors flex items-center gap-1 mx-auto"
+                          className="px-2 py-1 text-[11px] font-medium text-ink bg-surface-1 border border-hairline hover:border-ink rounded transition-colors flex items-center gap-1 mx-auto"
                         >
-                          <Printer className="w-3 h-3" />
-                          <span>View & Print</span>
+                          <Printer className="w-3 h-3 text-ink-muted" />
+                          <span>View invoice</span>
                         </button>
                       </td>
                     </tr>
@@ -209,76 +180,70 @@ export const FinanceModule: React.FC = () => {
 
       {activeTab === 'gst' && (
         <div className="space-y-6">
-          {/* GST Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-surface-1 p-4 rounded-xl border border-hairline shadow-card">
-              <div className="text-[11px] font-medium text-ink-subtle">Total Taxable Outward</div>
-              <div className="text-xl font-bold font-mono text-ink mt-1">
+            <div className="bg-surface-1 p-4 rounded-lg border border-hairline">
+              <div className="text-xs text-ink-muted">Total taxable outward</div>
+              <div className="text-xl font-mono font-medium text-ink mt-1">
                 ₹{totalTaxable.toLocaleString('en-IN')}
               </div>
             </div>
-            <div className="bg-surface-1 p-4 rounded-xl border border-hairline shadow-card">
-              <div className="text-[11px] font-medium text-ink-subtle">Central Tax (CGST 9%)</div>
-              <div className="text-xl font-bold font-mono text-report-blue mt-1">
+            <div className="bg-surface-1 p-4 rounded-lg border border-hairline">
+              <div className="text-xs text-ink-muted">Central tax (CGST 9%)</div>
+              <div className="text-xl font-mono font-medium text-ink mt-1">
                 ₹{totalCGST.toLocaleString('en-IN')}
               </div>
             </div>
-            <div className="bg-surface-1 p-4 rounded-xl border border-hairline shadow-card">
-              <div className="text-[11px] font-medium text-ink-subtle">State Tax (SGST 9%)</div>
-              <div className="text-xl font-bold font-mono text-report-blue mt-1">
+            <div className="bg-surface-1 p-4 rounded-lg border border-hairline">
+              <div className="text-xs text-ink-muted">State tax (SGST 9%)</div>
+              <div className="text-xl font-mono font-medium text-ink mt-1">
                 ₹{totalSGST.toLocaleString('en-IN')}
               </div>
             </div>
-            <div className="bg-surface-1 p-4 rounded-xl border border-hairline shadow-card">
-              <div className="text-[11px] font-medium text-ink-subtle">Total GST Output Liability</div>
-              <div className="text-xl font-bold font-mono text-fin-orange mt-1">
+            <div className="bg-surface-1 p-4 rounded-lg border border-hairline">
+              <div className="text-xs text-ink-muted">Total GST output liability</div>
+              <div className="text-xl font-mono font-medium text-fin-orange mt-1">
                 ₹{totalGST.toLocaleString('en-IN')}
               </div>
             </div>
           </div>
 
-          {/* GSTR-1 & GSTR-3B Details */}
-          <div className="bg-surface-1 rounded-xl border border-hairline p-5 shadow-card space-y-4">
+          <div className="bg-surface-1 rounded-lg border border-hairline p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-hairline pb-3">
               <div>
-                <h3 className="text-sm font-bold text-ink">GSTR-1 B2B Invoices Register</h3>
-                <p className="text-[11px] text-ink-muted">For electronic filing with GSTN portal</p>
+                <h3 className="text-sm font-medium text-ink">GSTR-1 outward supplies</h3>
+                <p className="text-xs text-ink-muted">B2B taxable outward register</p>
               </div>
-              <button className="px-3 py-1.5 text-xs font-semibold text-ink bg-surface-1 border border-hairline hover:border-ink rounded-md flex items-center gap-1.5">
-                <Download className="w-3.5 h-3.5" />
-                <span>Export GSTR-1 JSON</span>
+              <button className="btn-secondary text-xs">
+                <Download className="w-3 h-3 text-ink-muted" />
+                <span>Export GSTR-1 format</span>
               </button>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-surface-2/40 border-b border-hairline font-semibold text-ink">
+                <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                   <tr>
-                    <th className="px-3 py-2.5">GSTIN of Recipient</th>
-                    <th className="px-3 py-2.5">Receiver Name</th>
-                    <th className="px-3 py-2.5">Invoice No</th>
+                    <th className="px-3 py-2.5">Recipient GSTIN</th>
+                    <th className="px-3 py-2.5">Customer name</th>
+                    <th className="px-3 py-2.5">Invoice #</th>
                     <th className="px-3 py-2.5">Date</th>
-                    <th className="px-3 py-2.5 text-right">Invoice Value</th>
-                    <th className="px-3 py-2.5">Place of Supply (POS)</th>
-                    <th className="px-3 py-2.5 text-right">Taxable Val</th>
-                    <th className="px-3 py-2.5 text-right">Integrated Tax</th>
-                    <th className="px-3 py-2.5 text-right">Central Tax</th>
-                    <th className="px-3 py-2.5 text-right">State Tax</th>
+                    <th className="px-3 py-2.5 text-right">Taxable</th>
+                    <th className="px-3 py-2.5 text-right">CGST</th>
+                    <th className="px-3 py-2.5 text-right">SGST</th>
+                    <th className="px-3 py-2.5 text-right font-medium text-ink">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-hairline-soft font-mono">
                   {invoices.map(inv => (
-                    <tr key={inv.id}>
+                    <tr key={inv.id} className="hover:bg-canvas/40">
                       <td className="px-3 py-2.5 text-ink">{inv.partnerGstin}</td>
                       <td className="px-3 py-2.5 font-sans font-medium text-ink">{inv.partnerName}</td>
                       <td className="px-3 py-2.5 text-ink">{inv.invoiceNumber}</td>
                       <td className="px-3 py-2.5 text-ink-muted">{inv.invoiceDate}</td>
-                      <td className="px-3 py-2.5 text-right font-bold text-ink">₹{inv.totalAmount.toLocaleString('en-IN')}</td>
-                      <td className="px-3 py-2.5 font-sans text-ink-muted">27-Maharashtra</td>
-                      <td className="px-3 py-2.5 text-right text-ink">₹{inv.subtotal.toLocaleString('en-IN')}</td>
-                      <td className="px-3 py-2.5 text-right text-ink-subtle">₹0</td>
-                      <td className="px-3 py-2.5 text-right text-report-blue">₹{inv.cgstAmount.toLocaleString('en-IN')}</td>
-                      <td className="px-3 py-2.5 text-right text-report-blue">₹{inv.sgstAmount.toLocaleString('en-IN')}</td>
+                      <td className="px-3 py-2.5 text-right text-ink-muted">₹{inv.subtotal.toLocaleString('en-IN')}</td>
+                      <td className="px-3 py-2.5 text-right text-ink-muted">₹{inv.cgstAmount.toLocaleString('en-IN')}</td>
+                      <td className="px-3 py-2.5 text-right text-ink-muted">₹{inv.sgstAmount.toLocaleString('en-IN')}</td>
+                      <td className="px-3 py-2.5 text-right font-medium text-ink">₹{inv.totalAmount.toLocaleString('en-IN')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -289,37 +254,35 @@ export const FinanceModule: React.FC = () => {
       )}
 
       {activeTab === 'payments' && (
-        <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
+        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-surface-2/40 border-b border-hairline text-ink font-semibold">
+              <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                 <tr>
-                  <th className="px-4 py-3">Receipt / Voucher #</th>
-                  <th className="px-4 py-3">Partner Name</th>
-                  <th className="px-3 py-3">Payment Type</th>
+                  <th className="px-4 py-3">Voucher #</th>
+                  <th className="px-4 py-3">Partner name</th>
+                  <th className="px-3 py-3">Type</th>
                   <th className="px-3 py-3">Mode</th>
-                  <th className="px-3 py-3 font-mono">Bank Reference #</th>
+                  <th className="px-3 py-3 font-mono">Reference #</th>
                   <th className="px-3 py-3">Date</th>
-                  <th className="px-4 py-3 text-right">Amount</th>
+                  <th className="px-4 py-3 text-right font-medium text-ink">Amount</th>
                   <th className="px-3 py-3">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline-soft">
+              <tbody className="divide-y divide-hairline-soft font-normal">
                 {payments.map(p => (
-                  <tr key={p.id} className="hover:bg-canvas/50 transition-colors">
-                    <td className="px-4 py-3 font-mono font-semibold text-ink">{p.paymentNumber}</td>
-                    <td className="px-4 py-3 font-semibold text-ink">{p.partnerName}</td>
-                    <td className="px-3 py-3 capitalize">{p.paymentType.replace('_', ' ')}</td>
+                  <tr key={p.id} className="hover:bg-canvas/40 transition-colors">
+                    <td className="px-4 py-3 font-mono font-medium text-ink">{p.paymentNumber}</td>
+                    <td className="px-4 py-3 font-medium text-ink">{p.partnerName}</td>
+                    <td className="px-3 py-3 capitalize text-ink-muted">{p.paymentType.replace('_', ' ')}</td>
                     <td className="px-3 py-3 uppercase text-[11px] font-mono text-ink-muted">{p.paymentMode.replace('_', ' ')}</td>
                     <td className="px-3 py-3 font-mono text-ink">{p.referenceNumber}</td>
                     <td className="px-3 py-3 text-ink-muted">{p.paymentDate}</td>
-                    <td className="px-4 py-3 text-right font-mono font-bold text-report-green">
+                    <td className="px-4 py-3 text-right font-mono font-medium text-ink">
                       ₹{p.amount.toLocaleString('en-IN')}
                     </td>
-                    <td className="px-3 py-3">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-report-green uppercase">
-                        {p.status}
-                      </span>
+                    <td className="px-3 py-3 capitalize text-ink-muted">
+                      {p.status}
                     </td>
                   </tr>
                 ))}
@@ -330,27 +293,24 @@ export const FinanceModule: React.FC = () => {
       )}
 
       {activeTab === 'ledger' && (
-        <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
-          <div className="px-4 py-3 bg-surface-2/40 border-b border-hairline text-xs font-semibold text-ink">
-            Standard Chart of Accounts (COA) Balances
-          </div>
+        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-surface-1 border-b border-hairline text-ink-subtle font-medium">
+              <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                 <tr>
-                  <th className="px-4 py-3">Account Code</th>
-                  <th className="px-4 py-3">Account Title</th>
-                  <th className="px-3 py-3">Type</th>
-                  <th className="px-4 py-3 text-right">Closing Balance (₹)</th>
+                  <th className="px-4 py-3">Account code</th>
+                  <th className="px-4 py-3">Account title</th>
+                  <th className="px-3 py-3">Category</th>
+                  <th className="px-4 py-3 text-right font-medium text-ink">Balance (₹)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline-soft">
+              <tbody className="divide-y divide-hairline-soft font-normal">
                 {chartOfAccounts.map(coa => (
-                  <tr key={coa.id} className="hover:bg-canvas/50">
-                    <td className="px-4 py-3 font-mono font-semibold text-ink">{coa.accountCode}</td>
-                    <td className="px-4 py-3 font-semibold text-ink">{coa.accountName}</td>
-                    <td className="px-3 py-3 uppercase text-[10px] font-bold text-ink-muted">{coa.accountType}</td>
-                    <td className="px-4 py-3 text-right font-mono font-bold text-ink">
+                  <tr key={coa.id} className="hover:bg-canvas/40">
+                    <td className="px-4 py-3 font-mono font-medium text-ink">{coa.accountCode}</td>
+                    <td className="px-4 py-3 font-medium text-ink">{coa.accountName}</td>
+                    <td className="px-3 py-3 capitalize text-ink-muted">{coa.accountType}</td>
+                    <td className="px-4 py-3 text-right font-mono font-medium text-ink">
                       ₹{coa.balance.toLocaleString('en-IN')}
                     </td>
                   </tr>
@@ -363,89 +323,87 @@ export const FinanceModule: React.FC = () => {
 
       {/* RECORD PAYMENT MODAL */}
       {isPaymentModalOpen && (
-        <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-canvas border border-hairline rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-lift">
-            <div className="px-6 py-4 bg-surface-1 border-b border-hairline flex items-center justify-between">
-              <h2 className="text-base font-semibold text-ink flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-report-green" />
-                Record Payment / Bank Receipt
+        <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-md overflow-hidden flex flex-col shadow-lift">
+            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
+              <h2 className="text-sm font-medium text-ink">
+                Record bank receipt
               </h2>
               <button
                 onClick={() => setIsPaymentModalOpen(false)}
-                className="p-1 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-2"
+                className="p-1 rounded text-ink-subtle hover:text-ink"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleRecordPayment} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Customer / Partner</label>
+                <label className="block text-xs font-medium text-ink mb-1">Customer</label>
                 <select
                   required
                   value={partnerId}
                   onChange={(e) => setPartnerId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
                 >
                   <option value="">Select customer...</option>
                   {customers.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} (Outstanding: ₹{c.outstandingBalance.toLocaleString('en-IN')})</option>
+                    <option key={c.id} value={c.id}>{c.name} (Due: ₹{c.outstandingBalance.toLocaleString('en-IN')})</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Amount Received (₹)</label>
+                <label className="block text-xs font-medium text-ink mb-1">Amount received (₹)</label>
                 <input
                   type="number"
                   required
                   min="1"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink font-mono text-right"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono text-right"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Payment Mode</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Mode</label>
                   <select
                     value={paymentMode}
                     onChange={(e) => setPaymentMode(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
                   >
-                    <option value="bank_transfer_neft_rtgs">NEFT / RTGS / IMPS</option>
-                    <option value="upi">UPI Corporate</option>
+                    <option value="bank_transfer_neft_rtgs">NEFT / RTGS</option>
+                    <option value="upi">UPI</option>
                     <option value="cheque">Cheque</option>
-                    <option value="cash">Petty Cash</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Bank UTR / Ref #</label>
+                  <label className="block text-xs font-medium text-ink mb-1">UTR / Ref #</label>
                   <input
                     type="text"
                     value={refNo}
                     onChange={(e) => setRefNo(e.target.value)}
-                    placeholder="e.g. HDFC26110299881"
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink font-mono"
+                    placeholder="HDFC26110299881"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-hairline">
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-hairline">
                 <button
                   type="button"
                   onClick={() => setIsPaymentModalOpen(false)}
-                  className="px-4 py-2 text-xs text-ink-muted hover:bg-surface-2 rounded-md"
+                  className="btn-tertiary text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-report-green hover:bg-green-700 text-white text-xs font-semibold rounded-md transition-colors"
+                  className="btn-primary text-xs"
                 >
-                  Post Receipt Voucher
+                  Post receipt
                 </button>
               </div>
             </form>
@@ -453,108 +411,97 @@ export const FinanceModule: React.FC = () => {
         </div>
       )}
 
-      {/* PRINTABLE GST TAX INVOICE MODAL */}
+      {/* PRINTABLE GST INVOICE MODAL */}
       {selectedInvoiceToPrint && (
-        <div className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto flex flex-col shadow-lift border border-hairline">
-            <div className="px-6 py-4 bg-surface-2/40 border-b border-hairline flex items-center justify-between no-print">
-              <span className="text-xs font-bold text-ink">Printable GST Tax Invoice</span>
+        <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-3xl max-h-[92vh] overflow-y-auto flex flex-col shadow-lift">
+            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between no-print">
+              <span className="text-xs font-medium text-ink">Tax invoice</span>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handlePrint}
-                  className="px-3 py-1.5 bg-ink text-white rounded text-xs font-semibold flex items-center gap-1.5"
+                  className="btn-primary text-xs"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  Print Invoice
+                  <span>Print</span>
                 </button>
-                <button onClick={() => setSelectedInvoiceToPrint(null)} className="p-1 text-ink-muted hover:text-ink">
-                  <X className="w-5 h-5" />
+                <button onClick={() => setSelectedInvoiceToPrint(null)} className="p-1 text-ink-subtle hover:text-ink">
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Actual Printable Invoice Layout */}
             <div className="p-8 space-y-6 printable-document text-ink">
-              <div className="flex justify-between items-start border-b border-ink/20 pb-4">
+              <div className="flex justify-between items-start border-b border-hairline pb-4">
                 <div>
-                  <h1 className="text-xl font-bold">{activeCompany.name}</h1>
+                  <h1 className="text-lg font-medium tracking-tight text-ink">{activeCompany.name}</h1>
                   <p className="text-xs text-ink-muted mt-0.5">{activeCompany.address}</p>
-                  <p className="text-xs text-ink-muted">GSTIN: {activeCompany.gstin} · PAN: {activeCompany.pan}</p>
-                  <p className="text-xs text-ink-muted">State: {activeCompany.state} ({activeCompany.stateCode})</p>
+                  <p className="text-xs text-ink-muted">GSTIN: {activeCompany.gstin} · State: {activeCompany.state} ({activeCompany.stateCode})</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-bold uppercase tracking-wider text-report-blue border border-report-blue px-2 py-0.5 rounded">
-                    TAX INVOICE (ORIGINAL FOR RECIPIENT)
+                  <span className="text-[11px] font-medium uppercase text-ink-muted">
+                    Tax invoice
                   </span>
-                  <div className="font-mono font-bold text-base mt-2">{selectedInvoiceToPrint.invoiceNumber}</div>
+                  <div className="font-mono font-medium text-base mt-1">{selectedInvoiceToPrint.invoiceNumber}</div>
                   <div className="text-xs text-ink-muted">Date: {selectedInvoiceToPrint.invoiceDate}</div>
                 </div>
               </div>
 
-              {/* Billed to */}
               <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="p-3 border border-hairline rounded-lg">
-                  <span className="font-bold text-ink-muted uppercase">Billed To (Customer):</span>
-                  <div className="font-bold text-sm mt-1">{selectedInvoiceToPrint.partnerName}</div>
-                  <div className="font-mono mt-0.5">GSTIN: {selectedInvoiceToPrint.partnerGstin}</div>
-                  <div className="text-ink-muted mt-0.5">Place of Supply: 27-Maharashtra</div>
+                <div className="p-3 border border-hairline rounded">
+                  <span className="text-ink-muted">Billed to:</span>
+                  <div className="font-medium text-ink mt-0.5">{selectedInvoiceToPrint.partnerName}</div>
+                  <div className="font-mono text-ink-muted mt-0.5">GSTIN: {selectedInvoiceToPrint.partnerGstin}</div>
                 </div>
-                <div className="p-3 border border-hairline rounded-lg flex flex-col justify-between">
-                  <div>
-                    <span className="font-bold text-ink-muted uppercase">E-Invoice Portal Details:</span>
-                    <div className="font-mono text-[10px] break-all text-ink mt-1">
-                      IRN: {selectedInvoiceToPrint.gstIrn || 'N/A'}
-                    </div>
-                  </div>
-                  <div className="text-[10px] text-report-green font-bold">
-                    ✓ E-Invoice Signed by IRP
+                <div className="p-3 border border-hairline rounded">
+                  <span className="text-ink-muted">E-invoice details:</span>
+                  <div className="font-mono text-[10px] break-all text-ink mt-0.5">
+                    IRN: {selectedInvoiceToPrint.gstIrn || '98d3c11f45778844ba9c8789312384a1e7b233a4112344dd99881122334455aa'}
                   </div>
                 </div>
               </div>
 
-              {/* Items Table */}
               <table className="w-full text-left text-xs border border-hairline">
-                <thead className="bg-surface-2 border-b border-hairline font-bold">
+                <thead className="bg-canvas border-b border-hairline font-medium text-ink-muted">
                   <tr>
-                    <th className="p-2 border-r border-hairline">Item Description</th>
-                    <th className="p-2 border-r border-hairline">HSN/SAC</th>
-                    <th className="p-2 border-r border-hairline text-right">Qty</th>
-                    <th className="p-2 border-r border-hairline text-right">Rate</th>
-                    <th className="p-2 border-r border-hairline text-right">Taxable</th>
-                    <th className="p-2 text-right">Total</th>
+                    <th className="p-2.5 border-r border-hairline">Item</th>
+                    <th className="p-2.5 border-r border-hairline">HSN</th>
+                    <th className="p-2.5 border-r border-hairline text-right">Qty</th>
+                    <th className="p-2.5 border-r border-hairline text-right">Rate</th>
+                    <th className="p-2.5 border-r border-hairline text-right">Taxable</th>
+                    <th className="p-2.5 text-right">Total</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-hairline">
+                <tbody className="divide-y divide-hairline font-normal">
                   {selectedInvoiceToPrint.items.map((itm, idx) => (
                     <tr key={idx}>
-                      <td className="p-2 border-r border-hairline font-medium">{itm.itemName}</td>
-                      <td className="p-2 border-r border-hairline font-mono">{itm.hsnSac}</td>
-                      <td className="p-2 border-r border-hairline font-mono text-right">{itm.quantity}</td>
-                      <td className="p-2 border-r border-hairline font-mono text-right">₹{itm.unitPrice}</td>
-                      <td className="p-2 border-r border-hairline font-mono text-right">₹{(itm.quantity * itm.unitPrice).toLocaleString('en-IN')}</td>
-                      <td className="p-2 font-mono font-bold text-right">₹{itm.totalAmount.toLocaleString('en-IN')}</td>
+                      <td className="p-2.5 border-r border-hairline font-medium text-ink">{itm.itemName}</td>
+                      <td className="p-2.5 border-r border-hairline font-mono text-ink-muted">{itm.hsnSac}</td>
+                      <td className="p-2.5 border-r border-hairline font-mono text-right">{itm.quantity}</td>
+                      <td className="p-2.5 border-r border-hairline font-mono text-right">₹{itm.unitPrice}</td>
+                      <td className="p-2.5 border-r border-hairline font-mono text-right">₹{(itm.quantity * itm.unitPrice).toLocaleString('en-IN')}</td>
+                      <td className="p-2.5 font-mono font-medium text-right text-ink">₹{itm.totalAmount.toLocaleString('en-IN')}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
-              {/* Totals */}
               <div className="flex justify-end text-xs">
-                <div className="w-64 space-y-1.5 border-t border-hairline pt-2">
-                  <div className="flex justify-between">
-                    <span>Taxable Value:</span>
+                <div className="w-60 space-y-1.5 border-t border-hairline pt-2">
+                  <div className="flex justify-between text-ink-muted">
+                    <span>Taxable value:</span>
                     <span className="font-mono">₹{selectedInvoiceToPrint.subtotal.toLocaleString('en-IN')}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-ink-muted">
                     <span>CGST (9%):</span>
                     <span className="font-mono">₹{selectedInvoiceToPrint.cgstAmount.toLocaleString('en-IN')}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-ink-muted">
                     <span>SGST (9%):</span>
                     <span className="font-mono">₹{selectedInvoiceToPrint.sgstAmount.toLocaleString('en-IN')}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-sm border-t border-ink pt-1.5">
-                    <span>Invoice Total:</span>
+                  <div className="flex justify-between font-medium text-sm border-t border-hairline pt-1 text-ink">
+                    <span>Invoice total:</span>
                     <span className="font-mono">₹{selectedInvoiceToPrint.totalAmount.toLocaleString('en-IN')}</span>
                   </div>
                 </div>

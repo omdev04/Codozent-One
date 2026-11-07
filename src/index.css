@@ -11,7 +11,12 @@
   --ink: #111111;
   --ink-muted: #626260;
   --ink-subtle: #7b7b78;
+  --ink-tertiary: #9c9fa5;
   --fin-orange: #ff5600;
+  --report-blue: #2563eb;
+  --report-green: #16a34a;
+  --report-pink: #ec4899;
+  --report-lime: #84cc16;
 }
 
 body {
@@ -23,10 +28,132 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Intercom / DESIGN.md Button Styles */
+@layer components {
+  /* button-primary: Charcoal CTA. The default primary CTA across all pages */
+  .btn-primary {
+    background-color: #111111;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: background-color 150ms ease, transform 100ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary:hover {
+    background-color: #222222;
+  }
+  .btn-primary:active {
+    background-color: #000000;
+    transform: scale(0.99);
+  }
+
+  /* button-secondary: White button on cream */
+  .btn-secondary {
+    background-color: #ffffff;
+    color: #111111;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid #d3cec6;
+    transition: background-color 150ms ease, border-color 150ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-secondary:hover {
+    background-color: #faf8f5;
+    border-color: #111111;
+  }
+
+  /* button-tertiary: Plain text button on cream */
+  .btn-tertiary {
+    background-color: transparent;
+    color: #111111;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 10px 14px;
+    border-radius: 8px;
+    transition: background-color 150ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-tertiary:hover {
+    background-color: #ece7e1;
+  }
+
+  /* button-fin: Fin Orange CTA reserved for AI / Smart actions */
+  .btn-fin {
+    background-color: #ff5600;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 10px 18px;
+    border-radius: 8px;
+    transition: background-color 150ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-fin:hover {
+    background-color: #e04c00;
+  }
+
+  /* Pill-toggle containers according to DESIGN.md */
+  .pill-container {
+    background-color: #ece7e1;
+    border-radius: 9999px;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pill-item {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    color: #626260;
+    transition: all 150ms ease;
+  }
+  .pill-item-active {
+    background-color: #ffffff;
+    color: #111111;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Card Lift on Cream */
+  .card-lift {
+    background-color: #ffffff;
+    border: 1px solid #d3cec6;
+    border-radius: 12px;
+  }
+
+  .card-lift-lg {
+    background-color: #ffffff;
+    border: 1px solid #d3cec6;
+    border-radius: 16px;
+  }
+}
+
 /* Custom subtle scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: #f5f1ec;
@@ -49,7 +176,7 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Print optimizations for Delivery Challans and Tax Invoices */
+/* Print optimizations */
 @media print {
   body {
     background: #ffffff !important;
@@ -63,9 +190,7 @@ input[type="number"] {
   }
   .printable-document {
     border: none !important;
-    box-shadow: none !important;
     padding: 0 !important;
     width: 100% !important;
   }
 }
-

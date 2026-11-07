@@ -104,3 +104,4 @@ npm run preview
 2. Open your Supabase Project dashboard -> **SQL Editor**.
 3. Paste the contents of `supabase/schema.sql` and run it.
 4. In the FactoryFlow app, click the **Supabase** badge in the top navigation bar, enter your Project URL and Anon Key, and click **Save & Test Connection**.
+

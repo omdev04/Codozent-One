@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Building2, 
   ShieldCheck, 
   Database, 
   Search, 
-  AlertTriangle, 
-  Sparkles,
   ChevronDown,
-  Bell,
-  RefreshCw,
-  SlidersHorizontal
+  RotateCcw
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
 import { ERPRole } from '../../types/erp';
@@ -40,52 +36,67 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
+  
+  const compRef = useRef<HTMLDivElement>(null);
+  const roleRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (compRef.current && !compRef.current.contains(event.target as Node)) {
+        setCompanyDropdownOpen(false);
+      }
+      if (roleRef.current && !roleRef.current.contains(event.target as Node)) {
+        setRoleDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const mrpShortages = calculateMRP();
   const criticalShortagesCount = mrpShortages.filter(s => s.netShortage > 0).length;
 
   const rolesList: { role: ERPRole; label: string; desc: string }[] = [
-    { role: 'owner', label: 'Factory Owner / MD', desc: 'Full plant visibility, financials & strategy' },
-    { role: 'production_manager', label: 'Production Manager', desc: 'Work orders, BOMs, routing & planning' },
-    { role: 'storekeeper', label: 'Storekeeper', desc: 'Material issues, GRN receipts & stock ledger' },
-    { role: 'worker', label: 'Shop-Floor Worker', desc: 'Simplified terminal: My Tasks & Output' },
-    { role: 'qc_inspector', label: 'QC Inspector', desc: 'Incoming, in-process & final pass/fail' },
-    { role: 'accountant', label: 'Accountant', desc: 'GST invoices, GSTR-1/3B, Debtors/Creditors' },
-    { role: 'viewer', label: 'Auditor / Viewer', desc: 'Read-only compliance & reports' }
+    { role: 'owner', label: 'Owner / Managing Director', desc: 'Full plant & financials' },
+    { role: 'production_manager', label: 'Production Manager', desc: 'Work orders & planning' },
+    { role: 'storekeeper', label: 'Storekeeper', desc: 'GRN, issues & stock ledger' },
+    { role: 'worker', label: 'Shop-Floor Worker', desc: 'Tactile task terminal' },
+    { role: 'qc_inspector', label: 'QC Inspector', desc: 'Incoming & lot release' },
+    { role: 'accountant', label: 'Accountant', desc: 'GST, invoices & ledgers' },
+    { role: 'viewer', label: 'Auditor / Viewer', desc: 'Read-only compliance' }
   ];
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-canvas border-b border-hairline px-4 md:px-6 flex items-center justify-between">
+    <header className="sticky top-0 z-30 h-14 bg-canvas border-b border-hairline px-4 md:px-8 flex items-center justify-between">
       {/* Brand & Wordmark */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-6">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-md bg-ink text-white flex items-center justify-center font-bold tracking-tight text-sm shadow-sm">
-            <span className="text-fin-orange font-black">F</span>F
+          <div className="w-6 h-6 rounded bg-ink text-white flex items-center justify-center font-bold text-xs tracking-tight">
+            F
           </div>
-          <div className="flex flex-col">
-            <span className="text-base font-semibold text-ink tracking-tight flex items-center gap-1.5">
-              FactoryFlow <span className="text-[11px] font-medium px-1.5 py-0.5 rounded bg-surface-2 text-ink-muted">ERP</span>
-            </span>
-            <span className="text-[10px] text-ink-subtle hidden sm:inline">Chakan-Pune Industrial Belt</span>
-          </div>
+          <span className="text-sm font-medium text-ink tracking-tight">
+            FactoryFlow
+          </span>
+          <span className="text-[11px] font-normal text-ink-muted hidden sm:inline border-l border-hairline pl-2.5">
+            ERP
+          </span>
         </div>
 
-        {/* Multi-Company Context Switcher */}
-        <div className="relative">
+        {/* Company Context Selector */}
+        <div className="relative" ref={compRef}>
           <button
             onClick={() => { setCompanyDropdownOpen(!companyDropdownOpen); setRoleDropdownOpen(false); }}
-            className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-surface-1 border border-hairline hover:border-ink transition-colors text-xs font-medium text-ink shadow-card"
-            title="Switch Company Workspace"
+            className="flex items-center space-x-2 px-2.5 py-1 rounded-md bg-surface-1 border border-hairline hover:border-ink/50 transition-colors text-xs text-ink"
           >
-            <Building2 className="w-3.5 h-3.5 text-fin-orange" />
-            <span className="max-w-[140px] md:max-w-[200px] truncate">{activeCompany.name}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-ink-muted" />
+            <Building2 className="w-3.5 h-3.5 text-ink-muted" />
+            <span className="max-w-[130px] md:max-w-[210px] truncate font-medium">{activeCompany.name}</span>
+            <ChevronDown className="w-3 h-3 text-ink-muted" />
           </button>
 
           {companyDropdownOpen && (
             <div className="absolute left-0 mt-1.5 w-72 bg-surface-1 rounded-lg border border-hairline shadow-lift p-1.5 z-50">
-              <div className="px-2.5 py-1.5 text-[11px] font-semibold text-ink-subtle uppercase tracking-wider">
-                Select Company Workspace
+              <div className="px-2 py-1 text-[11px] font-medium text-ink-subtle">
+                Switch company workspace
               </div>
               {companies.map(c => (
                 <button
@@ -94,14 +105,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setActiveCompanyId(c.id);
                     setCompanyDropdownOpen(false);
                   }}
-                  className={`w-full text-left p-2.5 rounded-md transition-colors flex flex-col ${
-                    c.id === activeCompany.id ? 'bg-canvas text-ink font-semibold border-l-2 border-fin-orange' : 'hover:bg-surface-2 text-ink-muted'
+                  className={`w-full text-left p-2 rounded-md transition-colors flex flex-col ${
+                    c.id === activeCompany.id ? 'bg-surface-2 text-ink font-medium' : 'hover:bg-canvas text-ink-muted'
                   }`}
                 >
                   <div className="text-xs text-ink">{c.name}</div>
                   <div className="text-[10px] text-ink-subtle mt-0.5 flex justify-between">
                     <span>{c.code} · {c.city}</span>
-                    <span>GSTIN: {c.gstin.slice(0, 8)}...</span>
+                    <span>GST: {c.gstin.slice(0, 8)}...</span>
                   </div>
                 </button>
               ))}
@@ -110,51 +121,47 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Global Search */}
-      <div className="hidden lg:flex items-center flex-1 max-w-xs mx-6">
+      {/* Global Minimal Search */}
+      <div className="hidden md:flex items-center flex-1 max-w-xs mx-6">
         <div className="relative w-full">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-ink-muted" />
+          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-ink-subtle" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search items, orders, work orders..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-subtle focus:outline-none focus:border-ink transition-colors"
+            placeholder="Search parts, orders, work orders..."
+            className="w-full pl-8 pr-3 py-1 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-tertiary focus:outline-none focus:border-ink transition-colors"
           />
         </div>
       </div>
 
-      {/* Right Controls: Role Switcher, MRP Button, Supabase Status, Reset */}
+      {/* Right Controls */}
       <div className="flex items-center space-x-3">
-        {/* MRP Alert CTA */}
+        {/* Fin Orange MRP indicator if shortages exist */}
         {criticalShortagesCount > 0 && (
           <button
             onClick={onOpenMRP}
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md bg-fin-orange hover:bg-fin-orangeHover text-white text-xs font-medium transition-all shadow-sm animate-pulse"
-            title="Critical Material Shortages Detected"
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-fin-orange text-white text-xs font-medium hover:bg-fin-orangeHover transition-colors"
           >
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">MRP Shortages:</span>
-            <span className="bg-white/20 px-1.5 py-0.2 rounded text-[11px] font-bold">{criticalShortagesCount}</span>
+            <span>MRP: {criticalShortagesCount} shortages</span>
           </button>
         )}
 
-        {/* Role Switcher (RBAC Demo) */}
-        <div className="relative">
+        {/* Role Switcher */}
+        <div className="relative" ref={roleRef}>
           <button
             onClick={() => { setRoleDropdownOpen(!roleDropdownOpen); setCompanyDropdownOpen(false); }}
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md bg-surface-1 border border-hairline hover:border-ink transition-colors text-xs text-ink"
-            title="Switch Simulated User Role"
+            className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-surface-1 border border-hairline hover:border-ink/50 transition-colors text-xs text-ink"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-report-blue" />
+            <ShieldCheck className="w-3.5 h-3.5 text-ink-muted" />
             <span className="capitalize font-medium hidden sm:inline">{currentRole.replace('_', ' ')}</span>
             <ChevronDown className="w-3 h-3 text-ink-muted" />
           </button>
 
           {roleDropdownOpen && (
             <div className="absolute right-0 mt-1.5 w-64 bg-surface-1 rounded-lg border border-hairline shadow-lift p-1.5 z-50">
-              <div className="px-2.5 py-1.5 text-[11px] font-semibold text-ink-subtle uppercase tracking-wider">
-                Simulate Role-Based Access (RBAC)
+              <div className="px-2 py-1 text-[11px] font-medium text-ink-subtle">
+                Role-based access view
               </div>
               {rolesList.map(r => (
                 <button
@@ -164,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setRoleDropdownOpen(false);
                   }}
                   className={`w-full text-left p-2 rounded-md transition-colors ${
-                    r.role === currentRole ? 'bg-canvas text-ink font-semibold' : 'hover:bg-surface-2 text-ink-muted'
+                    r.role === currentRole ? 'bg-surface-2 text-ink font-medium' : 'hover:bg-canvas text-ink-muted'
                   }`}
                 >
                   <div className="text-xs text-ink">{r.label}</div>
@@ -175,24 +182,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
 
-        {/* Supabase Cloud Status Indicator */}
+        {/* Supabase Status Pill */}
         <button
           onClick={onOpenSupabaseModal}
-          className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md bg-surface-1 border border-hairline hover:border-ink transition-colors text-xs text-ink"
-          title="Supabase PostgreSQL Integration & Schema"
+          className="flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-surface-1 border border-hairline hover:border-ink/50 text-xs text-ink transition-colors"
+          title="Supabase PostgreSQL"
         >
-          <Database className={`w-3.5 h-3.5 ${isCloudConnected ? 'text-report-green' : 'text-fin-orange'}`} />
+          <Database className="w-3.5 h-3.5 text-ink-muted" />
           <span className="hidden md:inline font-medium">Supabase</span>
-          <span className={`w-2 h-2 rounded-full ${isCloudConnected ? 'bg-report-green' : 'bg-fin-orange animate-ping'}`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${isCloudConnected ? 'bg-report-green' : 'bg-ink-muted'}`} />
         </button>
 
-        {/* Reset Demo Data Button */}
+        {/* Reset Data */}
         <button
           onClick={resetToDemoData}
-          className="p-1.5 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-2 transition-colors"
-          title="Reset to Fresh Demonstration Data"
+          className="p-1 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-2 transition-colors"
+          title="Reset sample data"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RotateCcw className="w-3.5 h-3.5" />
         </button>
       </div>
     </header>

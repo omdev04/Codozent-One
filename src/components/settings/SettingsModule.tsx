@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
 import { 
-  Settings, 
   Building2, 
-  ShieldCheck, 
   Database, 
-  FileText, 
-  CheckCircle2, 
-  Copy, 
-  Download, 
-  RotateCcw,
-  History,
-  Key
+  RotateCcw
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -21,15 +13,12 @@ interface SettingsModuleProps {
 
 export const SettingsModule: React.FC<SettingsModuleProps> = ({ onOpenSupabaseModal }) => {
   const { 
-    companies, 
     activeCompany, 
-    currentRole, 
     auditLogs, 
     resetToDemoData 
   } = useERP();
 
   const [activeTab, setActiveTab] = useState<'company' | 'sequences' | 'rbac' | 'audit'>('company');
-  const [copied, setCopied] = useState(false);
 
   const documentSequences = [
     { type: 'Sales Orders', prefix: 'SO', format: 'SO-YYYY-#####', sample: 'SO-2026-00044' },
@@ -43,161 +32,132 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onOpenSupabaseMo
   ];
 
   const rbacRoles = [
-    { role: 'Owner / Managing Director', perm: 'Unrestricted full access across all modules, accounting & multi-company settings' },
-    { role: 'Admin', perm: 'System configuration, master data, user provisioning & numbering sequences' },
-    { role: 'Production Manager', perm: 'Work orders, bills of materials (BOM), MRP planning, routing & job dispatch' },
-    { role: 'Purchase User', perm: 'Supplier quotes, purchase orders, vendor performance & MRP requisition' },
-    { role: 'Storekeeper', perm: 'Dock receipts (GRN), raw material issues, stock ledger, transfers & physical counts' },
-    { role: 'Shop-Floor Worker', perm: 'Simplified tactile terminal: My assigned jobs, Start/Pause, good/rejects output' },
-    { role: 'QC Inspector', perm: 'Incoming GRN inspection, in-process tolerances, finished goods release & scrap lock' },
-    { role: 'Accountant', perm: 'GST tax invoices, GSTR-1/3B returns, payments, chart of accounts & General Ledger' },
+    { role: 'Owner / Managing Director', perm: 'Unrestricted full access across all operations, financial ledgers & tenancy' },
+    { role: 'Admin', perm: 'System parameters, master catalogs, user provisioning & sequence rules' },
+    { role: 'Production Manager', perm: 'Work orders, bills of materials (BOM), MRP requirements & job release' },
+    { role: 'Purchase User', perm: 'Vendor quotes, purchase orders, supplier evaluation & order releases' },
+    { role: 'Storekeeper', perm: 'Dock receipts (GRN), shop-floor material issues, stock ledger & physical counts' },
+    { role: 'Shop-Floor Worker', perm: 'Touch terminal: My assigned jobs, Start/Pause, good & rejection counts' },
+    { role: 'QC Inspector', perm: 'Dock receipt audits, in-process tolerances, finished release & scrap hold' },
+    { role: 'Accountant', perm: 'GST tax invoices, GSTR-1/3B summaries, payments & General Ledger' },
     { role: 'Viewer / Auditor', perm: 'Read-only access to records, compliance reports & audit logs' }
   ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-ink flex items-center gap-2">
-            <Settings className="w-5 h-5 text-ink" />
-            System Administration & Tenancy Settings
+          <div className="text-sm font-medium text-ink-muted">Tenancy & system configuration</div>
+          <h1 className="text-2xl font-medium text-ink tracking-tight mt-0.5">
+            Settings & database
           </h1>
-          <p className="text-xs text-ink-muted">
-            Configure multi-company parameters, document sequencing, role permissions & Supabase PostgreSQL backend
-          </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={onOpenSupabaseModal}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-ink hover:bg-black text-white text-xs font-semibold rounded-md transition-colors"
-          >
-            <Database className="w-3.5 h-3.5 text-report-green" />
-            <span>Supabase Cloud Integration</span>
-          </button>
-        </div>
+        <button
+          onClick={onOpenSupabaseModal}
+          className="btn-primary text-xs"
+        >
+          <Database className="w-3.5 h-3.5" />
+          <span>Supabase database</span>
+        </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center space-x-2 bg-surface-1 border border-hairline p-1 rounded-xl w-fit shadow-card">
+      {/* Pill Toggle */}
+      <div className="pill-container">
         <button
           onClick={() => setActiveTab('company')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-            activeTab === 'company' ? 'bg-canvas text-ink font-bold shadow-card' : 'text-ink-muted hover:text-ink'
-          }`}
+          className={`pill-item ${activeTab === 'company' ? 'pill-item-active' : ''}`}
         >
-          Company Profile
+          Company profile
         </button>
         <button
           onClick={() => setActiveTab('sequences')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-            activeTab === 'sequences' ? 'bg-canvas text-ink font-bold shadow-card' : 'text-ink-muted hover:text-ink'
-          }`}
+          className={`pill-item ${activeTab === 'sequences' ? 'pill-item-active' : ''}`}
         >
-          Document Sequences
+          Document sequences
         </button>
         <button
           onClick={() => setActiveTab('rbac')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-            activeTab === 'rbac' ? 'bg-canvas text-ink font-bold shadow-card' : 'text-ink-muted hover:text-ink'
-          }`}
+          className={`pill-item ${activeTab === 'rbac' ? 'pill-item-active' : ''}`}
         >
-          RBAC Permissions Matrix
+          Role permissions
         </button>
         <button
           onClick={() => setActiveTab('audit')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-            activeTab === 'audit' ? 'bg-canvas text-ink font-bold shadow-card' : 'text-ink-muted hover:text-ink'
-          }`}
+          className={`pill-item ${activeTab === 'audit' ? 'pill-item-active' : ''}`}
         >
-          Live Audit Log
+          Audit log
         </button>
       </div>
 
       {/* Active Tab Content */}
       {activeTab === 'company' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-surface-1 p-6 rounded-xl border border-hairline shadow-card space-y-4">
-            <h3 className="text-sm font-bold text-ink border-b border-hairline pb-2 flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-fin-orange" />
-              Active Manufacturing Legal Entity
+          <div className="bg-surface-1 p-6 rounded-lg border border-hairline space-y-4">
+            <h3 className="text-sm font-medium text-ink border-b border-hairline pb-2">
+              Active company legal entity
             </h3>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="text-ink-subtle">Company Name:</label>
-                <div className="font-bold text-ink text-sm mt-0.5">{activeCompany.name}</div>
+                <label className="text-ink-muted">Company name:</label>
+                <div className="font-medium text-ink text-sm mt-0.5">{activeCompany.name}</div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-ink-subtle">Company Code:</label>
-                  <div className="font-mono font-semibold text-ink">{activeCompany.code}</div>
+                  <label className="text-ink-muted">Company code:</label>
+                  <div className="font-mono text-ink mt-0.5">{activeCompany.code}</div>
                 </div>
                 <div>
-                  <label className="text-ink-subtle">Currency:</label>
-                  <div className="font-semibold text-ink">INR (₹ Indian Rupee)</div>
+                  <label className="text-ink-muted">Currency:</label>
+                  <div className="text-ink mt-0.5">INR (₹)</div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-ink-subtle">GSTIN Number:</label>
-                  <div className="font-mono font-bold text-ink">{activeCompany.gstin}</div>
+                  <label className="text-ink-muted">GSTIN:</label>
+                  <div className="font-mono text-ink mt-0.5">{activeCompany.gstin}</div>
                 </div>
                 <div>
-                  <label className="text-ink-subtle">Permanent Account (PAN):</label>
-                  <div className="font-mono font-bold text-ink">{activeCompany.pan}</div>
+                  <label className="text-ink-muted">PAN:</label>
+                  <div className="font-mono text-ink mt-0.5">{activeCompany.pan}</div>
                 </div>
               </div>
 
               <div>
-                <label className="text-ink-subtle">Registered Factory Address:</label>
-                <div className="text-ink">{activeCompany.address}, {activeCompany.city}, {activeCompany.state} - {activeCompany.pincode}</div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-1 border-t border-hairline-soft">
-                <div>
-                  <label className="text-ink-subtle">Fiscal Year:</label>
-                  <div className="font-semibold text-ink">01 April – 31 March</div>
-                </div>
-                <div>
-                  <label className="text-ink-subtle">State Code (GST):</label>
-                  <div className="font-mono font-semibold text-ink">{activeCompany.stateCode} (Maharashtra)</div>
-                </div>
+                <label className="text-ink-muted">Registered factory address:</label>
+                <div className="text-ink mt-0.5">{activeCompany.address}, {activeCompany.city}, {activeCompany.state} - {activeCompany.pincode}</div>
               </div>
             </div>
           </div>
 
-          {/* Reset Demo Data & Supabase Status */}
-          <div className="bg-surface-1 p-6 rounded-xl border border-hairline shadow-card space-y-5">
-            <h3 className="text-sm font-bold text-ink border-b border-hairline pb-2 flex items-center gap-2">
-              <Database className="w-4 h-4 text-report-blue" />
-              PostgreSQL & Storage Backend
+          <div className="bg-surface-1 p-6 rounded-lg border border-hairline space-y-4">
+            <h3 className="text-sm font-medium text-ink border-b border-hairline pb-2">
+              Database backend status
             </h3>
 
-            <div className="p-4 rounded-lg bg-surface-2/40 border border-hairline-soft text-xs space-y-2">
+            <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-ink">Engine Mode:</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                  isSupabaseConfigured ? 'bg-green-100 text-report-green' : 'bg-amber-100 text-amber-800'
-                }`}>
-                  {isSupabaseConfigured ? 'Live Supabase Cloud' : 'Local Enterprise Store'}
+                <span className="text-ink-muted">Active storage engine:</span>
+                <span className="font-medium text-ink">
+                  {isSupabaseConfigured ? 'Supabase PostgreSQL Cloud' : 'Local Enterprise Reactive Store'}
                 </span>
               </div>
               <p className="text-ink-muted">
-                Enterprise local state engine stores perpetual records locally with zero latency. You can attach any Supabase PostgreSQL instance at any time.
+                The application operates offline/online with zero latency. You can attach any Supabase PostgreSQL instance using the modal above.
               </p>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-4 border-t border-hairline">
               <button
                 onClick={resetToDemoData}
-                className="w-full py-2.5 px-4 bg-surface-1 border border-red-300 text-semantic-error hover:bg-red-50 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="btn-secondary text-xs w-full"
               >
-                <RotateCcw className="w-4 h-4" />
-                <span>Reset Application to Fresh Demo State</span>
+                <RotateCcw className="w-3.5 h-3.5 text-ink-muted" />
+                <span>Reset demo dataset</span>
               </button>
             </div>
           </div>
@@ -205,32 +165,32 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onOpenSupabaseMo
       )}
 
       {activeTab === 'sequences' && (
-        <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
-          <div className="p-4 border-b border-hairline bg-surface-2/30">
-            <h3 className="text-xs font-bold text-ink">Document Numbering & Auto-Sequencing</h3>
+        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
+          <div className="p-4 border-b border-hairline">
+            <h3 className="text-xs font-medium text-ink">Document numbering & sequencing</h3>
             <p className="text-[11px] text-ink-muted">
-              Concurrency-safe unique sequence generation per company and fiscal year, preventing numbering collisions
+              Concurrency-safe unique sequence generation per company and fiscal year
             </p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-surface-1 border-b border-hairline text-ink-subtle font-medium">
+              <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                 <tr>
-                  <th className="p-3">Document Type</th>
+                  <th className="p-3">Type</th>
                   <th className="p-3">Prefix</th>
-                  <th className="p-3 font-mono">Format Pattern</th>
-                  <th className="p-3 font-mono">Generated Example</th>
-                  <th className="p-3 text-right">Reset Frequency</th>
+                  <th className="p-3 font-mono">Format</th>
+                  <th className="p-3 font-mono">Example</th>
+                  <th className="p-3 text-right">Reset interval</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline-soft">
+              <tbody className="divide-y divide-hairline-soft font-normal">
                 {documentSequences.map((seq, idx) => (
-                  <tr key={idx} className="hover:bg-canvas/50">
-                    <td className="p-3 font-semibold text-ink">{seq.type}</td>
-                    <td className="p-3 font-mono font-bold text-fin-orange">{seq.prefix}</td>
+                  <tr key={idx} className="hover:bg-canvas/40">
+                    <td className="p-3 font-medium text-ink">{seq.type}</td>
+                    <td className="p-3 font-mono text-ink">{seq.prefix}</td>
                     <td className="p-3 font-mono text-ink-muted">{seq.format}</td>
-                    <td className="p-3 font-mono font-semibold text-ink">{seq.sample}</td>
-                    <td className="p-3 text-right text-ink-subtle">Annual (Fiscal Year)</td>
+                    <td className="p-3 font-mono text-ink">{seq.sample}</td>
+                    <td className="p-3 text-right text-ink-muted">Fiscal Year</td>
                   </tr>
                 ))}
               </tbody>
@@ -240,17 +200,17 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onOpenSupabaseMo
       )}
 
       {activeTab === 'rbac' && (
-        <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
-          <div className="p-4 border-b border-hairline bg-surface-2/30">
-            <h3 className="text-xs font-bold text-ink">Role-Based Access Control (RBAC) Matrix</h3>
+        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
+          <div className="p-4 border-b border-hairline">
+            <h3 className="text-xs font-medium text-ink">Role-based access control (RBAC)</h3>
             <p className="text-[11px] text-ink-muted">
-              Strict compartmentalization ensuring workers only see operational screens and finance remains restricted
+              Compartmentalization ensuring shop-floor workers only see operational screens
             </p>
           </div>
           <div className="divide-y divide-hairline-soft">
             {rbacRoles.map((r, idx) => (
-              <div key={idx} className="p-3.5 flex items-start justify-between text-xs hover:bg-canvas/40">
-                <div className="font-semibold text-ink w-48 shrink-0">{r.role}</div>
+              <div key={idx} className="p-3.5 flex items-start justify-between text-xs hover:bg-canvas/30">
+                <div className="font-medium text-ink w-48 shrink-0">{r.role}</div>
                 <div className="text-ink-muted flex-1 pl-4">{r.perm}</div>
               </div>
             ))}
@@ -259,31 +219,31 @@ export const SettingsModule: React.FC<SettingsModuleProps> = ({ onOpenSupabaseMo
       )}
 
       {activeTab === 'audit' && (
-        <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
-          <div className="p-4 border-b border-hairline bg-surface-2/30 flex items-center justify-between">
+        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
+          <div className="p-4 border-b border-hairline flex items-center justify-between">
             <div>
-              <h3 className="text-xs font-bold text-ink">Tamper-Proof Audit Trail</h3>
-              <p className="text-[11px] text-ink-muted">Cryptographic log of all creations, status changes and stock movements</p>
+              <h3 className="text-xs font-medium text-ink">Audit log</h3>
+              <p className="text-[11px] text-ink-muted">Audit trail of creates, updates and stock adjustments</p>
             </div>
-            <span className="font-mono text-xs text-ink-subtle">{auditLogs.length} Events Logged</span>
+            <span className="font-mono text-xs text-ink-muted">{auditLogs.length} events</span>
           </div>
           {auditLogs.length === 0 ? (
             <div className="p-8 text-center text-xs text-ink-muted">
-              No new manual actions logged in this session yet. Create an order or post an output to see events appear.
+              No new transactions logged in this session yet.
             </div>
           ) : (
-            <div className="divide-y divide-hairline-soft max-h-96 overflow-y-auto">
+            <div className="divide-y divide-hairline-soft max-h-96 overflow-y-auto font-normal">
               {auditLogs.map((log) => (
-                <div key={log.id} className="p-3 flex items-center justify-between text-xs hover:bg-canvas/50">
+                <div key={log.id} className="p-3 flex items-center justify-between text-xs hover:bg-canvas/40">
                   <div className="space-y-0.5">
                     <div className="flex items-center space-x-2">
-                      <span className="font-bold text-[10px] px-1.5 py-0.2 rounded bg-surface-2 text-ink uppercase">
+                      <span className="font-mono text-[10px] text-ink-muted uppercase">
                         {log.action}
                       </span>
-                      <span className="font-semibold text-ink">{log.entityName}</span>
-                      <span className="text-ink-subtle text-[11px]">{log.details}</span>
+                      <span className="font-medium text-ink">{log.entityName}</span>
+                      <span className="text-ink-muted text-[11px]">{log.details}</span>
                     </div>
-                    <div className="text-[10px] text-ink-subtle">by {log.userName}</div>
+                    <div className="text-[10px] text-ink-subtle">By: {log.userName}</div>
                   </div>
                   <div className="text-[10px] font-mono text-ink-subtle">
                     {new Date(log.timestamp).toLocaleTimeString()}

@@ -136,6 +136,40 @@ export interface BillOfMaterials {
   createdAt: string;
 }
 
+export type QuotationStatus = 'draft' | 'sent' | 'approved' | 'rejected' | 'converted_to_order';
+
+export interface QuotationItem {
+  id: string;
+  itemId: string;
+  itemCode: string;
+  itemName: string;
+  quantity: number;
+  unitPrice: number;
+  gstRate: number;
+  taxAmount: number;
+  totalAmount: number;
+}
+
+export interface Quotation {
+  id: string;
+  companyId: string;
+  quotationNumber: string;
+  revision: string; // 'Rev A', 'Rev B'
+  customerId: string;
+  customerName: string;
+  quoteDate: string;
+  validUntil: string;
+  status: QuotationStatus;
+  subtotal: number;
+  cgstAmount: number;
+  sgstAmount: number;
+  igstAmount: number;
+  grandTotal: number;
+  items: QuotationItem[];
+  notes?: string;
+  createdBy: string;
+}
+
 export type SalesOrderStatus = 
   | 'draft'
   | 'confirmed'

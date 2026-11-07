@@ -1,19 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  CheckCircle2, 
-  XCircle, 
   Plus, 
   Search, 
-  AlertTriangle, 
-  ShieldCheck, 
-  FileCheck2, 
-  Sliders,
-  Check,
-  X,
-  Lock
+  X
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
-import { QualityInspection } from '../../types/erp';
 
 export const QualityModule: React.FC = () => {
   const { 
@@ -78,105 +69,92 @@ export const QualityModule: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-ink flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-report-pink" />
-            Quality Assurance & Inspection Lock
+          <div className="text-sm font-medium text-ink-muted">Quality assurance & inspection</div>
+          <h1 className="text-2xl font-medium text-ink tracking-tight mt-0.5">
+            Incoming & final quality control
           </h1>
-          <p className="text-xs text-ink-muted">
-            Incoming vendor receipt audits, in-process routing checks, finished product release & rework disposition
-          </p>
         </div>
 
         <button
           onClick={() => setIsInspectModalOpen(true)}
-          className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-ink hover:bg-black text-white text-xs font-semibold rounded-md transition-colors"
+          className="btn-primary text-xs"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>New QC Inspection</span>
+          <span>New inspection</span>
         </button>
       </div>
 
       {/* Quality Gate Rule Callout */}
-      <div className="bg-surface-1 p-4 rounded-xl border border-hairline shadow-card flex items-center justify-between text-xs text-ink">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded-lg bg-pink-50 text-report-pink flex items-center justify-center shrink-0">
-            <Lock className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="font-bold text-ink">Quality Lock System Active:</span>
-            <p className="text-ink-muted">
-              Finished Goods cannot be dispatched on delivery challans, and raw materials cannot be issued to work orders, without an approved QC Inspection record.
-            </p>
-          </div>
+      <div className="bg-surface-1 p-4 rounded-lg border border-hairline flex items-center justify-between text-xs text-ink">
+        <div className="space-y-0.5">
+          <div className="font-medium text-ink">Quality lock active</div>
+          <p className="text-ink-muted">
+            Finished components cannot be dispatched, and incoming supplier materials cannot be issued to work orders, without an approved QC report.
+          </p>
         </div>
-        <div className="hidden md:flex items-center space-x-4 font-mono text-xs">
-          <span>Pending WO: <strong className="text-report-pink">{pendingWOs.length}</strong></span>
-          <span>Pending GRN: <strong className="text-report-orange">{pendingGRNs.length}</strong></span>
+        <div className="hidden sm:flex items-center space-x-3 text-ink-muted font-mono">
+          <span>Pending work orders: {pendingWOs.length}</span>
+          <span>Pending receipts: {pendingGRNs.length}</span>
         </div>
       </div>
 
       {/* Inspections Table */}
       <div className="space-y-4">
         <div className="relative max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-ink-muted" />
+          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-ink-subtle" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by QC #, item name, reference..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-subtle focus:outline-none focus:border-ink"
+            placeholder="Search by QC #, part, reference..."
+            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-tertiary focus:outline-none focus:border-ink transition-colors"
           />
         </div>
 
-        <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
+        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-surface-2/40 border-b border-hairline text-ink font-semibold">
+              <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                 <tr>
                   <th className="px-4 py-3">Inspection #</th>
-                  <th className="px-4 py-3">Reference Lot</th>
-                  <th className="px-4 py-3">Component Inspected</th>
+                  <th className="px-4 py-3">Reference lot</th>
+                  <th className="px-4 py-3">Part inspected</th>
                   <th className="px-3 py-3">Inspector</th>
                   <th className="px-3 py-3">Date</th>
-                  <th className="px-3 py-3 text-center">Sample Size</th>
+                  <th className="px-3 py-3 text-center">Sample size</th>
                   <th className="px-3 py-3">Verdict</th>
                   <th className="px-4 py-3">Disposition / Checkpoints</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline-soft">
+              <tbody className="divide-y divide-hairline-soft font-normal">
                 {filteredInspections.map((qi) => (
-                  <tr key={qi.id} className="hover:bg-canvas/50 transition-colors">
-                    <td className="px-4 py-3 font-mono font-semibold text-ink">
+                  <tr key={qi.id} className="hover:bg-canvas/40 transition-colors">
+                    <td className="px-4 py-3 font-mono font-medium text-ink">
                       {qi.inspectionNumber}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-mono text-xs font-semibold text-ink">{qi.referenceNumber}</span>
-                      <div className="text-[10px] uppercase font-bold text-ink-subtle">
+                      <span className="font-mono text-ink">{qi.referenceNumber}</span>
+                      <div className="text-[10px] uppercase text-ink-subtle">
                         {qi.referenceType.replace('_', ' ')}
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-semibold text-ink">
+                    <td className="px-4 py-3 font-medium text-ink">
                       {qi.itemName}
                     </td>
                     <td className="px-3 py-3 text-ink-muted">{qi.inspectorName}</td>
                     <td className="px-3 py-3 text-ink-muted">{qi.inspectionDate}</td>
-                    <td className="px-3 py-3 text-center font-mono">{qi.sampleSize} nos</td>
+                    <td className="px-3 py-3 text-center font-mono text-ink-muted">{qi.sampleSize} nos</td>
                     <td className="px-3 py-3">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase flex items-center w-max gap-1 ${
-                        qi.status === 'passed'
-                          ? 'bg-green-100 text-report-green'
-                          : 'bg-red-100 text-semantic-error'
-                      }`}>
-                        {qi.status === 'passed' ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                        {qi.status}
+                      <span className="text-[11px] font-medium capitalize text-ink">
+                        {qi.status.replace('_', ' ')}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="text-xs text-ink font-medium">{qi.correctiveAction}</div>
+                      <div className="text-xs text-ink">{qi.correctiveAction}</div>
                       <div className="text-[10px] text-ink-subtle">
-                        {qi.checkpoints.map(cp => `${cp.parameterName}: ${cp.observedValue} (${cp.result.toUpperCase()})`).join(' · ')}
+                        {qi.checkpoints.map(cp => `${cp.parameterName}: ${cp.observedValue}`).join(' · ')}
                       </div>
                     </td>
                   </tr>
@@ -189,50 +167,49 @@ export const QualityModule: React.FC = () => {
 
       {/* NEW INSPECTION MODAL */}
       {isInspectModalOpen && (
-        <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-canvas border border-hairline rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-lift">
-            <div className="px-6 py-4 bg-surface-1 border-b border-hairline flex items-center justify-between">
-              <h2 className="text-base font-semibold text-ink flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-report-pink" />
-                Record Quality Inspection
+        <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col shadow-lift">
+            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
+              <h2 className="text-sm font-medium text-ink">
+                Record quality inspection
               </h2>
               <button
                 onClick={() => setIsInspectModalOpen(false)}
-                className="p-1 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-2"
+                className="p-1 rounded text-ink-subtle hover:text-ink"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleCreateInspection} className="p-6 overflow-y-auto space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Inspection Type</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Inspection type</label>
                   <select
                     value={refType}
                     onChange={(e) => {
                       setRefType(e.target.value as any);
                       setSelectedRefId('');
                     }}
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
                   >
-                    <option value="work_order">Production Work Order (Final/In-Process)</option>
-                    <option value="grn">Supplier Dock Goods Receipt (Incoming)</option>
+                    <option value="work_order">Production work order lot</option>
+                    <option value="grn">Supplier dock receipt (GRN)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Select Lot / Order</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Select lot</label>
                   <select
                     required
                     value={selectedRefId}
                     onChange={(e) => setSelectedRefId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
                   >
                     <option value="">Select lot...</option>
                     {refType === 'work_order' ? (
                       workOrders.map(wo => (
-                        <option key={wo.id} value={wo.id}>{wo.woNumber} - {wo.productName} ({wo.status})</option>
+                        <option key={wo.id} value={wo.id}>{wo.woNumber} - {wo.productName}</option>
                       ))
                     ) : (
                       grns.map(g => (
@@ -243,14 +220,14 @@ export const QualityModule: React.FC = () => {
                 </div>
               </div>
 
-              {/* Checkpoints List */}
+              {/* Checkpoints */}
               <div className="space-y-2 pt-2">
-                <span className="text-xs font-semibold text-ink">Micrometer & Gauge Parameter Checkpoints</span>
+                <span className="text-xs font-medium text-ink">Gauge & dimension checkpoints</span>
                 <div className="space-y-2">
                   {checkpoints.map((cp, idx) => (
-                    <div key={idx} className="bg-surface-1 p-2.5 rounded-lg border border-hairline grid grid-cols-12 gap-2 items-center text-xs">
-                      <div className="col-span-5 font-medium text-ink">
-                        {cp.parameterName}
+                    <div key={idx} className="bg-canvas p-2.5 rounded border border-hairline grid grid-cols-12 gap-2 items-center text-xs">
+                      <div className="col-span-5 text-ink">
+                        <div className="font-medium">{cp.parameterName}</div>
                         <div className="text-[10px] text-ink-subtle">Spec: {cp.specification} ({cp.tolerance})</div>
                       </div>
                       <div className="col-span-4">
@@ -274,8 +251,8 @@ export const QualityModule: React.FC = () => {
                             updated[idx].result = updated[idx].result === 'pass' ? 'fail' : 'pass';
                             setCheckpoints(updated);
                           }}
-                          className={`px-3 py-1 text-[11px] font-bold rounded uppercase ${
-                            cp.result === 'pass' ? 'bg-green-100 text-report-green' : 'bg-red-100 text-semantic-error'
+                          className={`px-2.5 py-1 text-[11px] font-medium rounded capitalize ${
+                            cp.result === 'pass' ? 'bg-surface-1 text-ink border border-hairline' : 'bg-ink text-white'
                           }`}
                         >
                           {cp.result}
@@ -288,56 +265,56 @@ export const QualityModule: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Final Verdict</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Verdict</label>
                   <select
                     value={overallStatus}
                     onChange={(e) => setOverallStatus(e.target.value as any)}
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink font-bold"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-medium"
                   >
-                    <option value="passed">PASS (Release Lot)</option>
-                    <option value="failed">FAIL (Hold / Quarantine)</option>
-                    <option value="conditional_pass">CONDITIONAL PASS (Deviated)</option>
+                    <option value="passed">PASS (Release lot)</option>
+                    <option value="failed">FAIL (Hold / quarantine)</option>
+                    <option value="conditional_pass">CONDITIONAL PASS</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Sample Size Tested</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Sample size tested</label>
                   <input
                     type="number"
                     value={sampleSize}
                     onChange={(e) => setSampleSize(Number(e.target.value))}
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink font-mono"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono"
                   />
                 </div>
               </div>
 
               {overallStatus === 'failed' && (
                 <div>
-                  <label className="block text-xs font-bold text-semantic-error mb-1">Root Cause & Defect Analysis</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Root cause analysis</label>
                   <textarea
                     required
                     value={rootCause}
                     onChange={(e) => setRootCause(e.target.value)}
-                    placeholder="Describe failure reason, scrap disposition or rework route..."
+                    placeholder="Describe defect reason and rework disposition..."
                     rows={2}
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-red-300 text-ink"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
                   />
                 </div>
               )}
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-hairline">
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-hairline">
                 <button
                   type="button"
                   onClick={() => setIsInspectModalOpen(false)}
-                  className="px-4 py-2 text-xs text-ink-muted hover:bg-surface-2 rounded-md"
+                  className="btn-tertiary text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-ink hover:bg-black text-white text-xs font-semibold rounded-md transition-colors"
+                  className="btn-primary text-xs"
                 >
-                  Post Quality Record & Release
+                  Record verdict & update lot
                 </button>
               </div>
             </form>

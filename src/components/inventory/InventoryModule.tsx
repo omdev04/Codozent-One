@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
 import { 
-  Boxes, 
   Search, 
-  Plus, 
-  History, 
   Warehouse as WarehouseIcon, 
-  AlertTriangle, 
-  ArrowDownRight, 
-  ArrowUpRight,
-  SlidersHorizontal,
-  X,
-  FileSpreadsheet
+  X
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
 import { Item, ItemCategory } from '../../types/erp';
@@ -28,7 +20,7 @@ export const InventoryModule: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<ItemCategory | 'all'>('all');
   const [adjustModalItem, setAdjustModalItem] = useState<Item | null>(null);
   const [adjustQty, setAdjustQty] = useState(0);
-  const [adjustReason, setAdjustReason] = useState('Quarterly Physical Verification Audit');
+  const [adjustReason, setAdjustReason] = useState('Physical audit count verification');
 
   const filteredItems = items.filter(itm => {
     const matchesSearch = itm.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -51,60 +43,46 @@ export const InventoryModule: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-ink flex items-center gap-2">
-            <Boxes className="w-5 h-5 text-fin-orange" />
-            Inventory & Stores Control
+          <div className="text-sm font-medium text-ink-muted">Perpetual stock & stores control</div>
+          <h1 className="text-2xl font-medium text-ink tracking-tight mt-0.5">
+            Inventory & warehouse stock
           </h1>
-          <p className="text-xs text-ink-muted">
-            Master item catalog, perpetual stock ledger, multi-warehouse buffers & physical audit reconciliation
-          </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <div className="flex bg-surface-1 border border-hairline rounded-lg p-0.5 shadow-card">
-            <button
-              onClick={() => setActiveTab('items')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'items' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              Item Master
-            </button>
-            <button
-              onClick={() => setActiveTab('ledger')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'ledger' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              Stock Ledger Audit
-            </button>
-            <button
-              onClick={() => setActiveTab('warehouses')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'warehouses' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
-            >
-              Warehouses
-            </button>
-          </div>
+        <div className="pill-container">
+          <button
+            onClick={() => setActiveTab('items')}
+            className={`pill-item ${activeTab === 'items' ? 'pill-item-active' : ''}`}
+          >
+            Item master
+          </button>
+          <button
+            onClick={() => setActiveTab('ledger')}
+            className={`pill-item ${activeTab === 'ledger' ? 'pill-item-active' : ''}`}
+          >
+            Stock ledger
+          </button>
+          <button
+            onClick={() => setActiveTab('warehouses')}
+            className={`pill-item ${activeTab === 'warehouses' ? 'pill-item-active' : ''}`}
+          >
+            Locations
+          </button>
         </div>
       </div>
 
-      {/* Low Stock Alert Strip */}
+      {/* Subtle Low Stock Strip */}
       {lowStockItems.length > 0 && (
-        <div className="bg-fin-orangeLight border border-fin-orange/30 p-3.5 rounded-xl flex items-center justify-between text-xs text-ink">
-          <div className="flex items-center space-x-2.5">
-            <AlertTriangle className="w-4 h-4 text-fin-orange shrink-0" />
-            <span>
-              <strong>{lowStockItems.length} item(s) below reorder threshold:</strong>{' '}
-              {lowStockItems.map(i => `${i.name} (${i.currentStock} ${i.uom})`).join(', ')}
+        <div className="bg-surface-1 border border-hairline p-3 rounded-lg flex items-center justify-between text-xs text-ink">
+          <div className="flex items-center space-x-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-fin-orange" />
+            <span className="text-ink-muted">
+              {lowStockItems.length} item(s) below reorder threshold: {lowStockItems.map(i => `${i.name} (${i.currentStock} ${i.uom})`).join(', ')}
             </span>
           </div>
-          <span className="font-semibold text-fin-orange hover:underline cursor-pointer">
-            Trigger Reorder
-          </span>
+          <span className="text-xs font-medium text-fin-orange">Reorder needed</span>
         </div>
       )}
 
@@ -113,25 +91,25 @@ export const InventoryModule: React.FC = () => {
           {/* Controls: Search and Category Filter */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="relative max-w-sm w-full">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-ink-muted" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-ink-subtle" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search by code, item description, HSN..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-subtle focus:outline-none focus:border-ink"
+                placeholder="Search by part number, name, HSN..."
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-tertiary focus:outline-none focus:border-ink transition-colors"
               />
             </div>
 
-            <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <div className="flex items-center space-x-1 overflow-x-auto pb-1 sm:pb-0">
               {(['all', 'raw_material', 'wip', 'finished_goods', 'consumable'] as const).map(cat => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize whitespace-nowrap transition-colors ${
+                  className={`px-2.5 py-1 rounded text-xs capitalize transition-colors ${
                     selectedCategory === cat
-                      ? 'bg-ink text-white font-semibold'
-                      : 'bg-surface-1 border border-hairline text-ink-muted hover:text-ink'
+                      ? 'bg-ink text-white font-medium'
+                      : 'text-ink-muted hover:text-ink hover:bg-surface-2'
                   }`}
                 >
                   {cat.replace('_', ' ')}
@@ -141,50 +119,46 @@ export const InventoryModule: React.FC = () => {
           </div>
 
           {/* Items Table */}
-          <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
+          <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-surface-2/40 border-b border-hairline text-ink font-semibold">
+                <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                   <tr>
-                    <th className="px-4 py-3">Item Code</th>
-                    <th className="px-4 py-3">Name & Description</th>
+                    <th className="px-4 py-3">Code</th>
+                    <th className="px-4 py-3">Part description</th>
                     <th className="px-3 py-3">Category</th>
                     <th className="px-3 py-3">HSN/SAC</th>
-                    <th className="px-4 py-3 text-right">Standard Cost</th>
-                    <th className="px-4 py-3 text-right">Current On-Hand</th>
-                    <th className="px-3 py-3 text-right">Reorder Min</th>
-                    <th className="px-4 py-3 text-center">Actions</th>
+                    <th className="px-4 py-3 text-right">Standard cost</th>
+                    <th className="px-4 py-3 text-right font-medium text-ink">On hand</th>
+                    <th className="px-3 py-3 text-right">Reorder level</th>
+                    <th className="px-4 py-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-hairline-soft">
+                <tbody className="divide-y divide-hairline-soft font-normal">
                   {filteredItems.map((itm) => {
                     const isLow = itm.currentStock <= itm.reorderLevel;
                     return (
-                      <tr key={itm.id} className="hover:bg-canvas/50 transition-colors">
-                        <td className="px-4 py-3 font-mono font-semibold text-ink">
+                      <tr key={itm.id} className="hover:bg-canvas/40 transition-colors">
+                        <td className="px-4 py-3 font-mono font-medium text-ink">
                           {itm.itemCode}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="font-semibold text-ink">{itm.name}</div>
-                          <div className="text-[11px] text-ink-subtle truncate max-w-sm">
+                          <div className="font-medium text-ink">{itm.name}</div>
+                          <div className="text-[11px] text-ink-muted truncate max-w-sm">
                             {itm.description}
                           </div>
                         </td>
-                        <td className="px-3 py-3">
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface-2 text-ink uppercase">
-                            {itm.category.replace('_', ' ')}
-                          </span>
+                        <td className="px-3 py-3 capitalize text-ink-muted">
+                          {itm.category.replace('_', ' ')}
                         </td>
                         <td className="px-3 py-3 font-mono text-ink-muted">
                           {itm.hsnSacCode}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono text-ink">
+                        <td className="px-4 py-3 text-right font-mono text-ink-muted">
                           ₹{itm.standardCost.toFixed(2)}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono font-bold">
-                          <span className={isLow ? 'text-fin-orange' : 'text-ink'}>
-                            {itm.currentStock} {itm.uom}
-                          </span>
+                        <td className={`px-4 py-3 text-right font-mono font-medium ${isLow ? 'text-fin-orange' : 'text-ink'}`}>
+                          {itm.currentStock} {itm.uom}
                         </td>
                         <td className="px-3 py-3 text-right font-mono text-ink-muted">
                           {itm.reorderLevel} {itm.uom}
@@ -192,9 +166,9 @@ export const InventoryModule: React.FC = () => {
                         <td className="px-4 py-3 text-center">
                           <button
                             onClick={() => setAdjustModalItem(itm)}
-                            className="px-2.5 py-1 text-[11px] font-medium text-ink bg-surface-1 border border-hairline hover:border-ink rounded transition-colors"
+                            className="px-2 py-1 text-[11px] font-medium text-ink bg-surface-1 border border-hairline hover:border-ink rounded transition-colors"
                           >
-                            Adjust Stock
+                            Adjust
                           </button>
                         </td>
                       </tr>
@@ -209,59 +183,48 @@ export const InventoryModule: React.FC = () => {
 
       {activeTab === 'ledger' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-ink-muted">
-            <span>Audit Trail: Every inward, outward, issue and return is recorded cryptographically with timestamps.</span>
-            <span className="font-mono">{stockTransactions.length} Total Ledger Records</span>
-          </div>
-
-          <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
+          <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-surface-2/40 border-b border-hairline text-ink font-semibold">
+                <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                   <tr>
                     <th className="px-4 py-3">Transaction #</th>
                     <th className="px-4 py-3">Timestamp</th>
-                    <th className="px-4 py-3">Item & Code</th>
-                    <th className="px-3 py-3">Movement Type</th>
-                    <th className="px-4 py-3 text-right">Qty (+ / -)</th>
-                    <th className="px-4 py-3 text-right">Balance After</th>
-                    <th className="px-4 py-3">Reference / Notes</th>
-                    <th className="px-3 py-3">Logged By</th>
+                    <th className="px-4 py-3">Item</th>
+                    <th className="px-3 py-3">Movement</th>
+                    <th className="px-4 py-3 text-right">Quantity</th>
+                    <th className="px-4 py-3 text-right">Balance</th>
+                    <th className="px-4 py-3">Reference</th>
+                    <th className="px-3 py-3">Logged by</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-hairline-soft">
+                <tbody className="divide-y divide-hairline-soft font-normal">
                   {stockTransactions.map((st) => (
-                    <tr key={st.id} className="hover:bg-canvas/50 transition-colors">
-                      <td className="px-4 py-3 font-mono font-semibold text-ink">
+                    <tr key={st.id} className="hover:bg-canvas/40 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-ink">
                         {st.transactionNumber}
                       </td>
                       <td className="px-4 py-3 text-ink-muted font-mono text-[11px]">
                         {st.createdAt.slice(0, 16)}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-semibold text-ink">{st.itemName}</div>
-                        <div className="text-[11px] font-mono text-ink-subtle">{st.itemCode}</div>
+                        <div className="font-medium text-ink">{st.itemName}</div>
+                        <div className="text-[10px] font-mono text-ink-subtle">{st.itemCode}</div>
                       </td>
-                      <td className="px-3 py-3">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                          st.quantity > 0
-                            ? 'bg-green-100 text-report-green'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}>
-                          {st.transactionType.replace('_', ' ')}
-                        </span>
+                      <td className="px-3 py-3 capitalize text-ink-muted">
+                        {st.transactionType.replace('_', ' ')}
                       </td>
-                      <td className={`px-4 py-3 text-right font-mono font-bold ${
-                        st.quantity > 0 ? 'text-report-green' : 'text-ink'
+                      <td className={`px-4 py-3 text-right font-mono font-medium ${
+                        st.quantity > 0 ? 'text-ink' : 'text-ink-muted'
                       }`}>
                         {st.quantity > 0 ? `+${st.quantity}` : st.quantity}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono font-semibold text-ink">
+                      <td className="px-4 py-3 text-right font-mono font-medium text-ink">
                         {st.runningBalance}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-ink">{st.referenceNumber}</div>
-                        <div className="text-[11px] text-ink-subtle truncate max-w-xs">{st.notes}</div>
+                      <td className="px-4 py-3 text-ink-muted">
+                        <div>{st.referenceNumber}</div>
+                        <div className="text-[10px] text-ink-subtle">{st.notes}</div>
                       </td>
                       <td className="px-3 py-3 text-ink-muted">{st.createdBy}</td>
                     </tr>
@@ -276,16 +239,13 @@ export const InventoryModule: React.FC = () => {
       {activeTab === 'warehouses' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {warehouses.map(wh => (
-            <div key={wh.id} className="bg-surface-1 p-5 rounded-xl border border-hairline shadow-card space-y-3">
+            <div key={wh.id} className="bg-surface-1 p-5 rounded-lg border border-hairline space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2.5">
-                  <WarehouseIcon className="w-5 h-5 text-fin-orange" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-ink">{wh.name}</h3>
-                    <span className="font-mono text-xs text-ink-muted">Code: {wh.code}</span>
-                  </div>
+                <div>
+                  <h3 className="text-sm font-medium text-ink">{wh.name}</h3>
+                  <span className="font-mono text-xs text-ink-muted">Code: {wh.code}</span>
                 </div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-surface-2 text-ink">
+                <span className="text-[11px] text-ink-muted capitalize">
                   {wh.warehouseType.replace('_', ' ')}
                 </span>
               </div>
@@ -297,65 +257,64 @@ export const InventoryModule: React.FC = () => {
 
       {/* ADJUST STOCK MODAL */}
       {adjustModalItem && (
-        <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-canvas border border-hairline rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-lift">
-            <div className="px-6 py-4 bg-surface-1 border-b border-hairline flex items-center justify-between">
-              <h2 className="text-base font-semibold text-ink flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-fin-orange" />
-                Physical Stock Count Adjustment
+        <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-md overflow-hidden flex flex-col shadow-lift">
+            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
+              <h2 className="text-sm font-medium text-ink">
+                Stock reconciliation adjustment
               </h2>
               <button
                 onClick={() => setAdjustModalItem(null)}
-                className="p-1 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-2"
+                className="p-1 rounded text-ink-subtle hover:text-ink"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleStockAdjustment} className="p-6 space-y-4">
-              <div className="p-3 bg-surface-1 rounded-lg border border-hairline text-xs space-y-1">
-                <div className="font-semibold text-ink">{adjustModalItem.name}</div>
-                <div className="text-ink-muted">Current System Stock: {adjustModalItem.currentStock} {adjustModalItem.uom}</div>
+              <div className="p-3 bg-canvas rounded border border-hairline text-xs space-y-1">
+                <div className="font-medium text-ink">{adjustModalItem.name}</div>
+                <div className="text-ink-muted">Current balance: {adjustModalItem.currentStock} {adjustModalItem.uom}</div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">
-                  Quantity Difference (+ for surplus, - for shortage)
+                <label className="block text-xs font-medium text-ink mb-1">
+                  Quantity variance (+ for surplus, - for deficit)
                 </label>
                 <input
                   type="number"
                   required
                   value={adjustQty}
                   onChange={(e) => setAdjustQty(Number(e.target.value))}
-                  placeholder="e.g. -15 or +20"
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink font-mono"
+                  placeholder="e.g. -5 or +10"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Audit Reconciliation Reason</label>
+                <label className="block text-xs font-medium text-ink mb-1">Audit reason</label>
                 <input
                   type="text"
                   required
                   value={adjustReason}
                   onChange={(e) => setAdjustReason(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-hairline">
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-hairline">
                 <button
                   type="button"
                   onClick={() => setAdjustModalItem(null)}
-                  className="px-4 py-2 text-xs text-ink-muted hover:bg-surface-2 rounded-md"
+                  className="btn-tertiary text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-ink hover:bg-black text-white text-xs font-semibold rounded-md transition-colors"
+                  className="btn-primary text-xs"
                 >
-                  Post Adjustment to Ledger
+                  Post adjustment
                 </button>
               </div>
             </form>

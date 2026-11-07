@@ -6,15 +6,10 @@ import {
   FileText, 
   Truck, 
   Printer, 
-  CheckCircle, 
-  Eye, 
-  Calendar,
-  Building,
-  ArrowRight,
   X
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
-import { SalesOrder, Customer } from '../../types/erp';
+import { SalesOrder } from '../../types/erp';
 
 export const SalesModule: React.FC = () => {
   const { 
@@ -33,7 +28,6 @@ export const SalesModule: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedOrderForChallan, setSelectedOrderForChallan] = useState<SalesOrder | null>(null);
-  const [viewInvoiceOrder, setViewInvoiceOrder] = useState<SalesOrder | null>(null);
 
   // New Order Form State
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
@@ -49,7 +43,6 @@ export const SalesModule: React.FC = () => {
   const [vehicleNo, setVehicleNo] = useState('MH 12 RN 8845');
   const [eWayBill, setEWayBill] = useState('241188339901');
 
-  // Filter finished products only
   const finishedGoods = items.filter(i => i.category === 'finished_goods');
 
   const filteredOrders = salesOrders.filter(so => 
@@ -121,7 +114,6 @@ export const SalesModule: React.FC = () => {
   };
 
   const handleMakeWorkOrder = (so: SalesOrder) => {
-    // For each item in SO, check if BOM exists and trigger work order
     so.items.forEach(itm => {
       const bom = boms.find(b => b.productId === itm.itemId);
       if (bom) {
@@ -134,43 +126,37 @@ export const SalesModule: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-ink flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-report-blue" />
-            Sales & Order-to-Cash
+          <div className="text-sm font-medium text-ink-muted">Order-to-cash workflow</div>
+          <h1 className="text-2xl font-medium text-ink tracking-tight mt-0.5">
+            Sales & customer orders
           </h1>
-          <p className="text-xs text-ink-muted">
-            Manage customer master, quotations, confirmed orders, dispatch challans & GST invoices
-          </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <div className="flex bg-surface-1 border border-hairline rounded-lg p-0.5 shadow-card">
+        <div className="flex items-center space-x-3">
+          {/* Pill Toggle */}
+          <div className="pill-container">
             <button
               onClick={() => setActiveTab('orders')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'orders' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
+              className={`pill-item ${activeTab === 'orders' ? 'pill-item-active' : ''}`}
             >
-              Sales Orders
+              Sales orders
             </button>
             <button
               onClick={() => setActiveTab('customers')}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                activeTab === 'customers' ? 'bg-canvas text-ink' : 'text-ink-muted hover:text-ink'
-              }`}
+              className={`pill-item ${activeTab === 'customers' ? 'pill-item-active' : ''}`}
             >
-              Customer Master
+              Customer master
             </button>
           </div>
 
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-ink hover:bg-black text-white text-xs font-semibold rounded-md transition-colors"
+            className="btn-primary text-xs"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>New Order</span>
+            <span>Create order</span>
           </button>
         </div>
       </div>
@@ -179,42 +165,42 @@ export const SalesModule: React.FC = () => {
         <div className="space-y-4">
           {/* Search bar */}
           <div className="relative max-w-sm">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-ink-muted" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-ink-subtle" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by SO #, customer, customer PO..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-subtle focus:outline-none focus:border-ink transition-colors"
+              placeholder="Search by SO #, customer, PO..."
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-tertiary focus:outline-none focus:border-ink transition-colors"
             />
           </div>
 
           {/* Orders Table */}
-          <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
+          <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-surface-2/40 border-b border-hairline text-ink font-semibold">
+                <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                   <tr>
-                    <th className="px-4 py-3">Order Number</th>
+                    <th className="px-4 py-3">Order #</th>
                     <th className="px-4 py-3">Customer</th>
                     <th className="px-3 py-3">Customer PO #</th>
-                    <th className="px-3 py-3">Due Date</th>
+                    <th className="px-3 py-3">Due date</th>
                     <th className="px-3 py-3">Status</th>
                     <th className="px-4 py-3 text-right">Taxable</th>
-                    <th className="px-4 py-3 text-right">Grand Total (GST)</th>
-                    <th className="px-4 py-3 text-center">Actions</th>
+                    <th className="px-4 py-3 text-right font-medium text-ink">Total</th>
+                    <th className="px-4 py-3 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-hairline-soft">
+                <tbody className="divide-y divide-hairline-soft font-normal">
                   {filteredOrders.map((so) => (
-                    <tr key={so.id} className="hover:bg-canvas/50 transition-colors">
-                      <td className="px-4 py-3 font-mono font-semibold text-ink">
+                    <tr key={so.id} className="hover:bg-canvas/40 transition-colors">
+                      <td className="px-4 py-3 font-mono font-medium text-ink">
                         {so.soNumber}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-semibold text-ink">{so.customerName}</div>
-                        <div className="text-[11px] text-ink-subtle">
-                          {so.items.length} component line(s)
+                        <div className="font-medium text-ink">{so.customerName}</div>
+                        <div className="text-[11px] text-ink-muted">
+                          {so.items.length} line item(s)
                         </div>
                       </td>
                       <td className="px-3 py-3 font-mono text-ink-muted">
@@ -224,55 +210,43 @@ export const SalesModule: React.FC = () => {
                         {so.deliveryDate}
                       </td>
                       <td className="px-3 py-3">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                          so.status === 'completed'
-                            ? 'bg-green-100 text-report-green'
-                            : so.status === 'in_production'
-                            ? 'bg-blue-100 text-report-blue'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}>
+                        <span className="text-[11px] font-medium text-ink-muted capitalize">
                           {so.status.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-ink">
+                      <td className="px-4 py-3 text-right font-mono text-ink-muted">
                         ₹{so.subtotal.toLocaleString('en-IN')}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono font-bold text-ink">
+                      <td className="px-4 py-3 text-right font-mono font-medium text-ink">
                         ₹{so.grandTotal.toLocaleString('en-IN')}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-center space-x-2">
-                          {/* 1-Click Send to Production */}
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center space-x-1.5">
                           {so.status === 'confirmed' && (
                             <button
                               onClick={() => handleMakeWorkOrder(so)}
-                              className="px-2.5 py-1 bg-ink hover:bg-black text-white text-[11px] font-medium rounded transition-colors"
-                              title="Create Production Work Order from BOM"
+                              className="px-2 py-1 bg-ink text-white text-[11px] font-medium rounded hover:bg-black transition-colors"
                             >
-                              Release to Production
+                              Release to shop-floor
                             </button>
                           )}
 
-                          {/* Generate Delivery Challan */}
                           {['in_production', 'ready_for_dispatch'].includes(so.status) && (
                             <button
                               onClick={() => setSelectedOrderForChallan(so)}
-                              className="px-2.5 py-1 bg-report-blue hover:bg-blue-700 text-white text-[11px] font-medium rounded transition-colors flex items-center gap-1"
-                              title="Create Dispatch Challan"
+                              className="px-2 py-1 bg-surface-1 border border-hairline hover:border-ink text-ink text-[11px] font-medium rounded transition-colors flex items-center gap-1"
                             >
-                              <Truck className="w-3 h-3" />
+                              <Truck className="w-3 h-3 text-ink-muted" />
                               <span>Dispatch</span>
                             </button>
                           )}
 
-                          {/* Generate GST Tax Invoice */}
                           {so.status === 'completed' && (
                             <button
                               onClick={() => createSalesInvoiceFromOrder(so.id)}
-                              className="px-2.5 py-1 bg-report-green hover:bg-green-700 text-white text-[11px] font-medium rounded transition-colors flex items-center gap-1"
-                              title="Generate GST Tax Invoice"
+                              className="px-2 py-1 bg-surface-1 border border-hairline hover:border-ink text-ink text-[11px] font-medium rounded transition-colors flex items-center gap-1"
                             >
-                              <FileText className="w-3 h-3" />
+                              <FileText className="w-3 h-3 text-ink-muted" />
                               <span>Invoice</span>
                             </button>
                           )}
@@ -287,46 +261,45 @@ export const SalesModule: React.FC = () => {
         </div>
       ) : (
         /* Customers Master Table */
-        <div className="bg-surface-1 rounded-xl border border-hairline overflow-hidden shadow-card">
+        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-surface-2/40 border-b border-hairline text-ink font-semibold">
+              <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
                 <tr>
-                  <th className="px-4 py-3">Customer Code</th>
-                  <th className="px-4 py-3">Customer Name</th>
+                  <th className="px-4 py-3">Code</th>
+                  <th className="px-4 py-3">Customer name</th>
                   <th className="px-4 py-3">GSTIN & PAN</th>
-                  <th className="px-4 py-3">Contact Person</th>
-                  <th className="px-4 py-3 text-right">Credit Limit</th>
+                  <th className="px-4 py-3">Contact</th>
+                  <th className="px-4 py-3 text-right">Credit limit</th>
                   <th className="px-4 py-3 text-right">Outstanding</th>
-                  <th className="px-4 py-3">Payment Terms</th>
+                  <th className="px-4 py-3">Terms</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-hairline-soft">
+              <tbody className="divide-y divide-hairline-soft font-normal">
                 {customers.map((c) => (
-                  <tr key={c.id} className="hover:bg-canvas/50 transition-colors">
-                    <td className="px-4 py-3 font-mono font-semibold text-ink">
+                  <tr key={c.id} className="hover:bg-canvas/40 transition-colors">
+                    <td className="px-4 py-3 font-mono font-medium text-ink">
                       {c.customerCode}
                     </td>
-                    <td className="px-4 py-3 font-semibold text-ink">
+                    <td className="px-4 py-3 font-medium text-ink">
                       {c.name}
-                      <div className="text-[11px] text-ink-subtle font-normal">{c.city || 'Pune'}</div>
                     </td>
                     <td className="px-4 py-3 font-mono text-ink-muted">
                       <div>GST: {c.gstin}</div>
                       <div className="text-[10px] text-ink-subtle">PAN: {c.pan}</div>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="text-ink">{c.contactPerson}</div>
-                      <div className="text-[11px] text-ink-subtle">{c.phone}</div>
+                    <td className="px-4 py-3 text-ink-muted">
+                      <div>{c.contactPerson}</div>
+                      <div className="text-[10px] text-ink-subtle">{c.phone}</div>
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-ink">
+                    <td className="px-4 py-3 text-right font-mono text-ink-muted">
                       ₹{c.creditLimit.toLocaleString('en-IN')}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono font-bold text-red-600">
+                    <td className="px-4 py-3 text-right font-mono font-medium text-ink">
                       ₹{c.outstandingBalance.toLocaleString('en-IN')}
                     </td>
                     <td className="px-4 py-3 text-ink-muted">
-                      {c.creditDays} Days Net
+                      {c.creditDays} days
                     </td>
                   </tr>
                 ))}
@@ -336,88 +309,87 @@ export const SalesModule: React.FC = () => {
         </div>
       )}
 
-      {/* CREATE SALES ORDER MODAL */}
+      {/* CREATE ORDER MODAL */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-canvas border border-hairline rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-lift">
-            <div className="px-6 py-4 bg-surface-1 border-b border-hairline flex items-center justify-between">
-              <h2 className="text-base font-semibold text-ink flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4 text-fin-orange" />
-                Create New Sales Order
+        <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col shadow-lift">
+            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
+              <h2 className="text-sm font-medium text-ink">
+                Create sales order
               </h2>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-2"
+                className="p-1 rounded text-ink-subtle hover:text-ink"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleCreateOrder} className="p-6 overflow-y-auto space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Customer</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Customer</label>
                   <select
                     required
                     value={selectedCustomerId}
                     onChange={(e) => setSelectedCustomerId(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
                   >
                     <option value="">Select customer...</option>
                     {customers.map(c => (
-                      <option key={c.id} value={c.id}>{c.name} ({c.customerCode})</option>
+                      <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Customer PO Number</label>
+                  <label className="block text-xs font-medium text-ink mb-1">Customer PO number</label>
                   <input
                     type="text"
                     required
                     value={customerPoNo}
                     onChange={(e) => setCustomerPoNo(e.target.value)}
-                    placeholder="e.g. TML/CVBU/2026/894"
-                    className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
+                    placeholder="e.g. TML/CVBU/882"
+                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink font-mono"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Expected Delivery Date</label>
+                <label className="block text-xs font-medium text-ink mb-1">Target delivery date</label>
                 <input
                   type="date"
                   value={deliveryDate}
                   onChange={(e) => setDeliveryDate(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
                 />
               </div>
 
               {/* Order Items */}
               <div className="space-y-2 pt-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-ink">Finished Goods Components</span>
+                  <span className="text-xs font-medium text-ink">Manufactured parts</span>
                   <button
                     type="button"
                     onClick={handleAddItemRow}
-                    className="text-xs text-fin-orange font-semibold hover:underline"
+                    className="text-xs text-ink-muted hover:text-ink font-medium"
                   >
-                    + Add Item Row
+                    + Add line
                   </button>
                 </div>
 
                 {orderItems.map((oi, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 bg-surface-1 p-2.5 rounded-lg border border-hairline">
+                  <div key={index} className="grid grid-cols-12 gap-2 bg-canvas p-2 rounded border border-hairline">
                     <div className="col-span-6">
                       <select
                         required
                         value={oi.itemId}
                         onChange={(e) => handleItemChange(index, e.target.value)}
-                        className="w-full px-2 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
+                        className="w-full px-2 py-1 text-xs rounded bg-surface-1 border border-hairline text-ink"
                       >
-                        <option value="">Select component...</option>
+                        <option value="">Select part...</option>
                         {finishedGoods.map(fg => (
-                          <option key={fg.id} value={fg.id}>{fg.name} ({fg.itemCode})</option>
+                          <option key={fg.id} value={fg.id}>{fg.name}</option>
                         ))}
                       </select>
                     </div>
@@ -432,21 +404,21 @@ export const SalesModule: React.FC = () => {
                           updated[index].quantity = Number(e.target.value);
                           setOrderItems(updated);
                         }}
-                        className="w-full px-2 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono text-right"
+                        className="w-full px-2 py-1 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono text-right"
                       />
                     </div>
 
                     <div className="col-span-3">
                       <input
                         type="number"
-                        placeholder="Unit Price (₹)"
+                        placeholder="Price (₹)"
                         value={oi.unitPrice}
                         onChange={(e) => {
                           const updated = [...orderItems];
                           updated[index].unitPrice = Number(e.target.value);
                           setOrderItems(updated);
                         }}
-                        className="w-full px-2 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono text-right"
+                        className="w-full px-2 py-1 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono text-right"
                       />
                     </div>
                   </div>
@@ -454,29 +426,29 @@ export const SalesModule: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Notes / Instructions</label>
+                <label className="block text-xs font-medium text-ink mb-1">Notes</label>
                 <textarea
                   value={orderNotes}
                   onChange={(e) => setOrderNotes(e.target.value)}
-                  placeholder="Special packaging, drawing revision note..."
+                  placeholder="Packaging specifications or heat treatment instructions..."
                   rows={2}
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-hairline">
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-hairline">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 text-xs text-ink-muted hover:bg-surface-2 rounded-md"
+                  className="btn-tertiary text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-ink hover:bg-black text-white text-xs font-semibold rounded-md transition-colors"
+                  className="btn-primary text-xs"
                 >
-                  Save & Confirm Order
+                  Confirm order
                 </button>
               </div>
             </form>
@@ -486,78 +458,74 @@ export const SalesModule: React.FC = () => {
 
       {/* DISPATCH CHALLAN MODAL */}
       {selectedOrderForChallan && (
-        <div className="fixed inset-0 z-50 bg-ink/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-canvas border border-hairline rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-lift">
-            <div className="px-6 py-4 bg-surface-1 border-b border-hairline flex items-center justify-between">
-              <h2 className="text-base font-semibold text-ink flex items-center gap-2">
-                <Truck className="w-4 h-4 text-report-blue" />
-                Dispatch Delivery Challan
+        <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-md overflow-hidden flex flex-col shadow-lift">
+            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
+              <h2 className="text-sm font-medium text-ink">
+                Dispatch delivery challan
               </h2>
               <button
                 onClick={() => setSelectedOrderForChallan(null)}
-                className="p-1 rounded-md text-ink-subtle hover:text-ink hover:bg-surface-2"
+                className="p-1 rounded text-ink-subtle hover:text-ink"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleGenerateChallan} className="p-6 space-y-4">
-              <div className="p-3 rounded-lg bg-surface-1 border border-hairline text-xs space-y-1">
-                <div className="font-semibold text-ink">Order: {selectedOrderForChallan.soNumber}</div>
-                <div className="text-ink-muted">Customer: {selectedOrderForChallan.customerName}</div>
-                <div className="text-fin-orange font-medium mt-1">
-                  Will decrement {selectedOrderForChallan.items.reduce((a, b) => a + b.quantity, 0)} units from Finished Goods store.
-                </div>
+              <div className="p-3 rounded bg-canvas border border-hairline text-xs space-y-1">
+                <div className="font-medium text-ink">Order: {selectedOrderForChallan.soNumber}</div>
+                <div className="text-ink-muted">Recipient: {selectedOrderForChallan.customerName}</div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Transporter Name</label>
+                <label className="block text-xs font-medium text-ink mb-1">Transporter</label>
                 <input
                   type="text"
                   required
                   value={transporter}
                   onChange={(e) => setTransporter(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Vehicle Number</label>
+                <label className="block text-xs font-medium text-ink mb-1">Vehicle number</label>
                 <input
                   type="text"
                   required
                   value={vehicleNo}
                   onChange={(e) => setVehicleNo(e.target.value)}
-                  placeholder="e.g. MH 12 RN 8845"
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink font-mono"
+                  placeholder="MH 12 RN 8845"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">E-Way Bill Number</label>
+                <label className="block text-xs font-medium text-ink mb-1">E-Way bill number</label>
                 <input
                   type="text"
                   required
                   value={eWayBill}
                   onChange={(e) => setEWayBill(e.target.value)}
-                  placeholder="12-digit GST e-Way Bill"
-                  className="w-full px-3 py-2 text-xs rounded-md bg-surface-1 border border-hairline text-ink font-mono"
+                  placeholder="12-digit number"
+                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono"
                 />
               </div>
 
-              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-hairline">
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-hairline">
                 <button
                   type="button"
                   onClick={() => setSelectedOrderForChallan(null)}
-                  className="px-4 py-2 text-xs text-ink-muted hover:bg-surface-2 rounded-md"
+                  className="btn-tertiary text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-report-blue hover:bg-blue-700 text-white text-xs font-semibold rounded-md transition-colors"
+                  className="btn-primary text-xs"
                 >
-                  Confirm Dispatch & Challan
+                  Generate challan
                 </button>
               </div>
             </form>
