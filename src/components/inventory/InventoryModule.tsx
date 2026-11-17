@@ -51,22 +51,34 @@ export const InventoryModule: React.FC = () => {
           </h1>
         </div>
 
-        <div className="pill-container">
+        <div className="pill-container bg-surface-2 p-1 rounded-lg border border-hairline inline-flex items-center gap-1">
           <button
             onClick={() => setActiveTab('items')}
-            className={`pill-item ${activeTab === 'items' ? 'pill-item-active' : ''}`}
+            className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+              activeTab === 'items'
+                ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline'
+                : 'text-ink-muted hover:text-ink hover:bg-white/60'
+            }`}
           >
             Item master
           </button>
           <button
             onClick={() => setActiveTab('ledger')}
-            className={`pill-item ${activeTab === 'ledger' ? 'pill-item-active' : ''}`}
+            className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+              activeTab === 'ledger'
+                ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline'
+                : 'text-ink-muted hover:text-ink hover:bg-white/60'
+            }`}
           >
             Stock ledger
           </button>
           <button
             onClick={() => setActiveTab('warehouses')}
-            className={`pill-item ${activeTab === 'warehouses' ? 'pill-item-active' : ''}`}
+            className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+              activeTab === 'warehouses'
+                ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline'
+                : 'text-ink-muted hover:text-ink hover:bg-white/60'
+            }`}
           >
             Locations
           </button>

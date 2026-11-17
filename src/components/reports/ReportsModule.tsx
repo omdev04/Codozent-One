@@ -74,28 +74,36 @@ export const ReportsModule: React.FC = () => {
       </div>
 
       {/* Pill Toggle */}
-      <div className="pill-container">
+      <div className="pill-container bg-surface-2 p-1 rounded-lg border border-hairline inline-flex items-center gap-1">
         <button
           onClick={() => setReportType('production')}
-          className={`pill-item ${reportType === 'production' ? 'pill-item-active' : ''}`}
+          className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+            reportType === 'production' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+          }`}
         >
           Production output
         </button>
         <button
           onClick={() => setReportType('stock')}
-          className={`pill-item ${reportType === 'stock' ? 'pill-item-active' : ''}`}
+          className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+            reportType === 'stock' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+          }`}
         >
           Stock valuation
         </button>
         <button
           onClick={() => setReportType('sales')}
-          className={`pill-item ${reportType === 'sales' ? 'pill-item-active' : ''}`}
+          className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+            reportType === 'sales' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+          }`}
         >
           Sales register
         </button>
         <button
           onClick={() => setReportType('quality')}
-          className={`pill-item ${reportType === 'quality' ? 'pill-item-active' : ''}`}
+          className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+            reportType === 'quality' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+          }`}
         >
           QC logs
         </button>

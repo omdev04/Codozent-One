@@ -71,28 +71,36 @@ export const FinanceModule: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-3">
-          <div className="pill-container">
+          <div className="pill-container bg-surface-2 p-1 rounded-lg border border-hairline inline-flex items-center gap-1">
             <button
               onClick={() => setActiveTab('invoices')}
-              className={`pill-item ${activeTab === 'invoices' ? 'pill-item-active' : ''}`}
+              className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                activeTab === 'invoices' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+              }`}
             >
               Tax invoices
             </button>
             <button
               onClick={() => setActiveTab('gst')}
-              className={`pill-item ${activeTab === 'gst' ? 'pill-item-active' : ''}`}
+              className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                activeTab === 'gst' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+              }`}
             >
               GST returns
             </button>
             <button
               onClick={() => setActiveTab('payments')}
-              className={`pill-item ${activeTab === 'payments' ? 'pill-item-active' : ''}`}
+              className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                activeTab === 'payments' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+              }`}
             >
               Receipts
             </button>
             <button
               onClick={() => setActiveTab('ledger')}
-              className={`pill-item ${activeTab === 'ledger' ? 'pill-item-active' : ''}`}
+              className={`pill-item px-3.5 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                activeTab === 'ledger' ? 'pill-item-active bg-white shadow-xs text-primary font-bold border border-hairline' : 'text-ink-muted hover:text-ink hover:bg-white/60'
+              }`}
             >
               Ledger
             </button>

@@ -3,167 +3,193 @@
 @tailwind utilities;
 
 :root {
-  --canvas: #f5f1ec;
-  --surface-1: #ffffff;
-  --surface-2: #ece7e1;
-  --hairline: #d3cec6;
-  --hairline-soft: #e6e2db;
-  --ink: #111111;
-  --ink-muted: #626260;
-  --ink-subtle: #7b7b78;
-  --ink-tertiary: #9c9fa5;
-  --fin-orange: #ff5600;
-  --report-blue: #2563eb;
-  --report-green: #16a34a;
-  --report-pink: #ec4899;
-  --report-lime: #84cc16;
+  --canvas: #f8fafc;
+  --chrome: #ffffff;
+  --band: #f1f5f9;
+  --band-blue: #eff6ff;
+  --band-lavender: #f8fafc;
+  --primary: #0c6cf2;
+  --primary-deep: #0957d0;
+  --ink: #0f172a;
+  --ink-lead: #1e293b;
+  --ink-body: #334155;
+  --ink-list: #475569;
+  --ink-meta: #64748b;
+  --ink-nav: #64748b;
+  --hairline: #e2e8f0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
   background-color: var(--canvas);
-  color: var(--ink);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--ink-body);
+  font-family: '72', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Intercom / DESIGN.md Button Styles */
+/* Razorpay Blade Design System Button & Control Classes */
 @layer components {
-  /* button-primary: Charcoal CTA. The default primary CTA across all pages */
+  /* button-primary: Razorpay Electric Blue (#0c6cf2) filled button with white text, crisp 6px corner */
   .btn-primary {
-    background-color: #111111;
+    background-color: #0c6cf2;
     color: #ffffff;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
     line-height: 1.2;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: background-color 150ms ease, transform 100ms ease;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    transition: background-color 150ms ease, transform 100ms ease, box-shadow 150ms ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(12, 108, 242, 0.2);
   }
   .btn-primary:hover {
-    background-color: #222222;
+    background-color: #0957d0;
   }
   .btn-primary:active {
-    background-color: #000000;
+    background-color: #084db8;
     transform: scale(0.99);
   }
 
-  /* button-secondary: White button on cream */
+  /* button-outline & button-secondary: Sleek white button with hairline border */
+  .btn-outline,
   .btn-secondary {
     background-color: #ffffff;
-    color: #111111;
-    font-size: 15px;
+    color: #0f172a;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1.2;
-    padding: 10px 18px;
-    border-radius: 8px;
-    border: 1px solid #d3cec6;
-    transition: background-color 150ms ease, border-color 150ms ease;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    cursor: pointer;
   }
+  .btn-outline:hover,
   .btn-secondary:hover {
-    background-color: #faf8f5;
-    border-color: #111111;
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+    color: #0c6cf2;
   }
 
-  /* button-tertiary: Plain text button on cream */
-  .btn-tertiary {
+  /* button-subtle / neutral */
+  .btn-subtle {
     background-color: transparent;
-    color: #111111;
-    font-size: 15px;
+    color: #475569;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1.2;
-    padding: 10px 14px;
-    border-radius: 8px;
-    transition: background-color 150ms ease;
+    padding: 7px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: background-color 150ms ease, color 150ms ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
+    cursor: pointer;
   }
-  .btn-tertiary:hover {
-    background-color: #ece7e1;
-  }
-
-  /* button-fin: Fin Orange CTA reserved for AI / Smart actions */
-  .btn-fin {
-    background-color: #ff5600;
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.2;
-    padding: 10px 18px;
-    border-radius: 8px;
-    transition: background-color 150ms ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-fin:hover {
-    background-color: #e04c00;
+  .btn-subtle:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
   }
 
-  /* Pill-toggle containers according to DESIGN.md */
+  /* Full-width flat bands */
+  .band-neutral {
+    background-color: #f8fafc;
+    border-radius: 0;
+  }
+  .band-blue {
+    background-color: #eff6ff;
+    border-radius: 0;
+  }
+  .band-lavender {
+    background-color: #f8fafc;
+    border-radius: 0;
+  }
+
+  /* Segmented Tab & Pill Container */
   .pill-container {
-    background-color: #ece7e1;
-    border-radius: 9999px;
-    padding: 4px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 3px;
   }
 
   .pill-item {
     font-size: 13px;
     font-weight: 500;
+    color: #64748b;
     padding: 6px 14px;
-    border-radius: 9999px;
-    color: #626260;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    cursor: pointer;
     transition: all 150ms ease;
-  }
-  .pill-item-active {
-    background-color: #ffffff;
-    color: #111111;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  }
-
-  /* Card Lift on Cream */
-  .card-lift {
-    background-color: #ffffff;
-    border: 1px solid #d3cec6;
-    border-radius: 12px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
   }
 
-  .card-lift-lg {
-    background-color: #ffffff;
-    border: 1px solid #d3cec6;
-    border-radius: 16px;
+  .pill-item:hover {
+    color: #0f172a;
+    background-color: rgba(255, 255, 255, 0.7);
   }
+
+  .pill-item-active,
+  .pill-item.active {
+    color: #0c6cf2 !important;
+    background-color: #ffffff !important;
+    font-weight: 600 !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  }
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Custom subtle scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f1ec;
+  background: #f5f6f7;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d3cec6;
-  border-radius: 9999px;
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #b8b2a8;
+  background: #94a3b8;
 }
 
 /* Number inputs without spinner arrows */
@@ -176,7 +202,7 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Print optimizations */
+/* Print optimizations for Indian Tax Invoices & Challans */
 @media print {
   body {
     background: #ffffff !important;

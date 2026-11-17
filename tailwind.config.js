@@ -7,22 +7,49 @@ export default {
   theme: {
     extend: {
       colors: {
-        canvas: '#f5f1ec',
-        surface: {
-          1: '#ffffff',
-          2: '#ece7e1',
-          3: '#e4dfd8',
+        canvas: '#f8fafc',
+        chrome: '#ffffff',
+        band: {
+          DEFAULT: '#f1f5f9',
+          blue: '#eff6ff',
+          lavender: '#f8fafc',
+        },
+        primary: {
+          DEFAULT: '#0c6cf2', // Razorpay Dodger/Electric Blue
+          deep: '#0957d0',
+          hover: '#0957d0',
+        },
+        razor: {
+          blue: '#0c6cf2',
+          blueHover: '#0957d0',
+          navy: '#0c1a30',
+          navyDark: '#08162d',
+          navyHover: '#132847',
+          surface: '#f8fafc',
+          border: '#e2e8f0',
+        },
+        navy: '#0c1a30',
+        sky: '#38bdf8',
+        ink: {
+          DEFAULT: '#0f172a', // Slate 900
+          lead: '#1e293b',
+          body: '#334155',    // Slate 700
+          list: '#475569',
+          meta: '#64748b',
+          nav: '#64748b',
+          subtle: '#64748b',
+          muted: '#64748b',
+          tertiary: '#94a3b8',
         },
         hairline: {
-          DEFAULT: '#d3cec6',
-          soft: '#e6e2db',
-          dark: '#b8b2a8',
+          DEFAULT: '#e2e8f0',
+          soft: '#f1f5f9',
+          dark: '#94a3b8',
         },
-        ink: {
-          DEFAULT: '#111111',
-          muted: '#626260',
-          subtle: '#7b7b78',
-          tertiary: '#9c9fa5',
+        surface: {
+          1: '#ffffff',
+          2: '#f5f6f7',
+          3: '#eaecee',
         },
         fin: {
           orange: '#ff5600',
@@ -30,28 +57,23 @@ export default {
           orangeLight: '#fff0eb',
         },
         report: {
-          blue: '#2563eb',
+          blue: '#0057d2',
           green: '#16a34a',
-          pink: '#ec4899',
-          lime: '#84cc16',
-          orange: '#ea580c',
-        },
-        brand: {
-          blue: '#0007cb',
+          pink: '#db2777',
+          amber: '#d97706',
+          purple: '#7c3aed',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['72', 'Inter', 'Segoe UI', '-apple-system', 'BlinkMacSystemFont', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       borderRadius: {
-        'xs': '4px',
-        'sm': '6px',
+        'none': '0px',
+        'sm': '4px',
         'md': '8px',
         'lg': '12px',
         'xl': '16px',
-        '2xl': '24px',
-        'pill': '9999px',
       },
       boxShadow: {
         'card': '0 1px 2px rgba(0, 0, 0, 0.04)',
@@ -61,4 +83,3 @@ export default {
   },
   plugins: [],
 }
-

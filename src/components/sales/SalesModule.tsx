@@ -1,537 +1,239 @@
 import React, { useState } from 'react';
-import { 
-  Plus, 
-  Search, 
-  ShoppingCart, 
-  FileText, 
-  Truck, 
-  Printer, 
-  X
+import {
+  ShoppingCart,
+  Plus,
+  Truck,
+  Receipt,
+  BarChart3,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { useERP } from '../../context/ERPContext';
 import { SalesOrder } from '../../types/erp';
+import { SalesDashboard } from '../trade/sales/SalesDashboard';
+import { SalesOrderList } from '../trade/sales/SalesOrderList';
+import { SalesOrderFormModal } from '../trade/sales/SalesOrderFormModal';
+import { SalesOrderDetailDrawer } from '../trade/sales/SalesOrderDetailDrawer';
+import { SalesOrderPrintView } from '../trade/sales/SalesOrderPrintView';
+import { DeliveryDispatchList } from '../trade/sales/DeliveryDispatchList';
+import { DeliveryDispatchModal } from '../trade/sales/DeliveryDispatchModal';
+import { SalesInvoiceList } from '../trade/sales/SalesInvoiceList';
 
-export const SalesModule: React.FC = () => {
-  const { 
-    salesOrders, 
-    customers, 
-    items, 
-    boms,
-    createSalesOrder, 
-    updateSalesOrderStatus, 
-    createDeliveryChallan, 
-    createSalesInvoiceFromOrder,
-    createWorkOrder
-  } = useERP();
+interface SalesModuleProps {
+  onNavigateToManufacturing?: () => void;
+}
 
-  const [activeTab, setActiveTab] = useState<'orders' | 'customers'>('orders');
-  const [searchTerm, setSearchTerm] = useState('');
+export const SalesModule: React.FC<SalesModuleProps> = ({ onNavigateToManufacturing }) => {
+  const { salesOrders, invoices, updateSalesOrderStatus } = useERP();
+
+  const [activeTab, setActiveTab] = useState<'orders' | 'dispatch' | 'invoices' | 'dashboard'>('orders');
+
+  // Modals & Drawers state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedOrderForChallan, setSelectedOrderForChallan] = useState<SalesOrder | null>(null);
+  const [selectedOrderForDetail, setSelectedOrderForDetail] = useState<SalesOrder | null>(null);
+  const [selectedOrderForPrint, setSelectedOrderForPrint] = useState<SalesOrder | null>(null);
+  const [selectedOrderForDispatch, setSelectedOrderForDispatch] = useState<SalesOrder | null>(null);
+  const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
 
-  // New Order Form State
-  const [selectedCustomerId, setSelectedCustomerId] = useState('');
-  const [customerPoNo, setCustomerPoNo] = useState('');
-  const [deliveryDate, setDeliveryDate] = useState('');
-  const [orderItems, setOrderItems] = useState<{ itemId: string; quantity: number; unitPrice: number }[]>([
-    { itemId: '', quantity: 100, unitPrice: 0 }
-  ]);
-  const [orderNotes, setOrderNotes] = useState('');
+  const pendingSalesCount = salesOrders.filter(s => ['confirmed', 'in_production'].includes(s.status)).length;
+  const readyDispatchCount = salesOrders.filter(s => s.status === 'ready_for_dispatch').length;
 
-  // Dispatch Form State
-  const [transporter, setTransporter] = useState('VRL Logistics Ltd.');
-  const [vehicleNo, setVehicleNo] = useState('MH 12 RN 8845');
-  const [eWayBill, setEWayBill] = useState('241188339901');
-
-  const finishedGoods = items.filter(i => i.category === 'finished_goods');
-
-  const filteredOrders = salesOrders.filter(so => 
-    so.soNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    so.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    so.customerPoNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleAddItemRow = () => {
-    setOrderItems([...orderItems, { itemId: '', quantity: 100, unitPrice: 0 }]);
+  const handleOpenCreate = () => {
+    setIsCreateModalOpen(true);
   };
 
-  const handleItemChange = (index: number, itemId: string) => {
-    const itm = items.find(i => i.id === itemId);
-    const updated = [...orderItems];
-    updated[index].itemId = itemId;
-    updated[index].unitPrice = itm?.sellingPrice || 0;
-    setOrderItems(updated);
+  const handleSelectOrder = (order: SalesOrder) => {
+    setSelectedOrderForDetail(order);
   };
 
-  const handleCreateOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    const customer = customers.find(c => c.id === selectedCustomerId);
-    if (!customer) return;
-
-    const formattedItems = orderItems
-      .filter(oi => oi.itemId && oi.quantity > 0)
-      .map(oi => {
-        const itm = items.find(i => i.id === oi.itemId)!;
-        const total = oi.quantity * oi.unitPrice;
-        const tax = total * 0.18;
-        return {
-          id: `soi-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          itemId: itm.id,
-          itemCode: itm.itemCode,
-          itemName: itm.name,
-          quantity: oi.quantity,
-          unitPrice: oi.unitPrice,
-          gstRate: 18,
-          taxAmount: tax,
-          totalAmount: total + tax,
-          shippedQuantity: 0
-        };
-      });
-
-    const subtotal = formattedItems.reduce((acc, itm) => acc + (itm.quantity * itm.unitPrice), 0);
-
-    createSalesOrder({
-      customerId: customer.id,
-      customerName: customer.name,
-      customerPoNumber: customerPoNo || `PO-${Math.floor(1000 + Math.random() * 9000)}`,
-      orderDate: new Date().toISOString().split('T')[0],
-      deliveryDate: deliveryDate || new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-      subtotal,
-      items: formattedItems,
-      notes: orderNotes
-    });
-
-    setIsCreateModalOpen(false);
-    setSelectedCustomerId('');
-    setOrderItems([{ itemId: '', quantity: 100, unitPrice: 0 }]);
+  const handlePrintOrder = (order: SalesOrder) => {
+    setSelectedOrderForPrint(order);
   };
 
-  const handleGenerateChallan = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedOrderForChallan) return;
-    createDeliveryChallan(selectedOrderForChallan.id, transporter, vehicleNo, eWayBill);
-    setSelectedOrderForChallan(null);
-  };
-
-  const handleMakeWorkOrder = (so: SalesOrder) => {
-    so.items.forEach(itm => {
-      const bom = boms.find(b => b.productId === itm.itemId);
-      if (bom) {
-        createWorkOrder(itm.itemId, bom.id, itm.quantity, 'urgent', so.deliveryDate, so.id);
-      }
-    });
-    updateSalesOrderStatus(so.id, 'in_production');
+  const handleDispatchOrder = (order: SalesOrder) => {
+    setSelectedOrderForDispatch(order);
+    setIsDispatchModalOpen(true);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <div className="text-sm font-medium text-ink-muted">Order-to-cash workflow</div>
-          <h1 className="text-2xl font-medium text-ink tracking-tight mt-0.5">
-            Sales & customer orders
-          </h1>
+    <div className="space-y-6 pb-12">
+      {/* Module Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-xs">
+            <ShoppingCart className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold text-slate-900">Sales Orders & Invoicing</h1>
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Order to Cash
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Customer Purchase Orders, Work Order generation, Delivery Challans, and GST Tax Invoices.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-3">
-          {/* Pill Toggle */}
-          <div className="pill-container">
-            <button
-              onClick={() => setActiveTab('orders')}
-              className={`pill-item ${activeTab === 'orders' ? 'pill-item-active' : ''}`}
-            >
-              Sales orders
-            </button>
-            <button
-              onClick={() => setActiveTab('customers')}
-              className={`pill-item ${activeTab === 'customers' ? 'pill-item-active' : ''}`}
-            >
-              Customer master
-            </button>
-          </div>
-
+        <div className="flex items-center gap-2.5">
           <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="btn-primary text-xs"
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Create order</span>
+            <Plus className="w-4 h-4" />
+            <span>New Sales Order</span>
           </button>
         </div>
       </div>
 
-      {activeTab === 'orders' ? (
-        <div className="space-y-4">
-          {/* Search bar */}
-          <div className="relative max-w-sm">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-ink-subtle" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by SO #, customer, PO..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-surface-1 border border-hairline text-ink placeholder:text-ink-tertiary focus:outline-none focus:border-ink transition-colors"
-            />
-          </div>
+      {/* Tabs Navigation */}
+      <div className="flex items-center gap-2 border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab('orders')}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all ${
+            activeTab === 'orders'
+              ? 'border-emerald-600 text-emerald-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <ShoppingCart className="w-4 h-4" />
+          <span>Sales Orders</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 font-bold">
+            {salesOrders.length}
+          </span>
+          {pendingSalesCount > 0 && (
+            <span className="w-2 h-2 rounded-full bg-amber-500" title={`${pendingSalesCount} active orders`} />
+          )}
+        </button>
 
-          {/* Orders Table */}
-          <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
-                  <tr>
-                    <th className="px-4 py-3">Order #</th>
-                    <th className="px-4 py-3">Customer</th>
-                    <th className="px-3 py-3">Customer PO #</th>
-                    <th className="px-3 py-3">Due date</th>
-                    <th className="px-3 py-3">Status</th>
-                    <th className="px-4 py-3 text-right">Taxable</th>
-                    <th className="px-4 py-3 text-right font-medium text-ink">Total</th>
-                    <th className="px-4 py-3 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-hairline-soft font-normal">
-                  {filteredOrders.map((so) => (
-                    <tr key={so.id} className="hover:bg-canvas/40 transition-colors">
-                      <td className="px-4 py-3 font-mono font-medium text-ink">
-                        {so.soNumber}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-ink">{so.customerName}</div>
-                        <div className="text-[11px] text-ink-muted">
-                          {so.items.length} line item(s)
-                        </div>
-                      </td>
-                      <td className="px-3 py-3 font-mono text-ink-muted">
-                        {so.customerPoNumber}
-                      </td>
-                      <td className="px-3 py-3 text-ink-muted">
-                        {so.deliveryDate}
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="text-[11px] font-medium text-ink-muted capitalize">
-                          {so.status.replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono text-ink-muted">
-                        ₹{so.subtotal.toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-4 py-3 text-right font-mono font-medium text-ink">
-                        ₹{so.grandTotal.toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center space-x-1.5">
-                          {so.status === 'confirmed' && (
-                            <button
-                              onClick={() => handleMakeWorkOrder(so)}
-                              className="px-2 py-1 bg-ink text-white text-[11px] font-medium rounded hover:bg-black transition-colors"
-                            >
-                              Release to shop-floor
-                            </button>
-                          )}
+        <button
+          onClick={() => setActiveTab('dispatch')}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all ${
+            activeTab === 'dispatch'
+              ? 'border-emerald-600 text-emerald-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Truck className="w-4 h-4" />
+          <span>Delivery & Dispatch</span>
+          {readyDispatchCount > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-bold">
+              {readyDispatchCount} Ready
+            </span>
+          )}
+        </button>
 
-                          {['in_production', 'ready_for_dispatch'].includes(so.status) && (
-                            <button
-                              onClick={() => setSelectedOrderForChallan(so)}
-                              className="px-2 py-1 bg-surface-1 border border-hairline hover:border-ink text-ink text-[11px] font-medium rounded transition-colors flex items-center gap-1"
-                            >
-                              <Truck className="w-3 h-3 text-ink-muted" />
-                              <span>Dispatch</span>
-                            </button>
-                          )}
+        <button
+          onClick={() => setActiveTab('invoices')}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all ${
+            activeTab === 'invoices'
+              ? 'border-emerald-600 text-emerald-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Receipt className="w-4 h-4" />
+          <span>Tax Invoices</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-600 font-bold">
+            {invoices.length}
+          </span>
+        </button>
 
-                          {so.status === 'completed' && (
-                            <button
-                              onClick={() => createSalesInvoiceFromOrder(so.id)}
-                              className="px-2 py-1 bg-surface-1 border border-hairline hover:border-ink text-ink text-[11px] font-medium rounded transition-colors flex items-center gap-1"
-                            >
-                              <FileText className="w-3 h-3 text-ink-muted" />
-                              <span>Invoice</span>
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Customers Master Table */
-        <div className="bg-surface-1 rounded-lg border border-hairline overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-canvas border-b border-hairline text-ink-muted font-medium">
-                <tr>
-                  <th className="px-4 py-3">Code</th>
-                  <th className="px-4 py-3">Customer name</th>
-                  <th className="px-4 py-3">GSTIN & PAN</th>
-                  <th className="px-4 py-3">Contact</th>
-                  <th className="px-4 py-3 text-right">Credit limit</th>
-                  <th className="px-4 py-3 text-right">Outstanding</th>
-                  <th className="px-4 py-3">Terms</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-hairline-soft font-normal">
-                {customers.map((c) => (
-                  <tr key={c.id} className="hover:bg-canvas/40 transition-colors">
-                    <td className="px-4 py-3 font-mono font-medium text-ink">
-                      {c.customerCode}
-                    </td>
-                    <td className="px-4 py-3 font-medium text-ink">
-                      {c.name}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-ink-muted">
-                      <div>GST: {c.gstin}</div>
-                      <div className="text-[10px] text-ink-subtle">PAN: {c.pan}</div>
-                    </td>
-                    <td className="px-4 py-3 text-ink-muted">
-                      <div>{c.contactPerson}</div>
-                      <div className="text-[10px] text-ink-subtle">{c.phone}</div>
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-ink-muted">
-                      ₹{c.creditLimit.toLocaleString('en-IN')}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono font-medium text-ink">
-                      ₹{c.outstandingBalance.toLocaleString('en-IN')}
-                    </td>
-                    <td className="px-4 py-3 text-ink-muted">
-                      {c.creditDays} days
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all ${
+            activeTab === 'dashboard'
+              ? 'border-emerald-600 text-emerald-600'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          <span>Sales Analytics</span>
+        </button>
+      </div>
 
-      {/* CREATE ORDER MODAL */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col shadow-lift">
-            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
-              <h2 className="text-sm font-medium text-ink">
-                Create sales order
-              </h2>
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="p-1 rounded text-ink-subtle hover:text-ink"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      {/* Main Tab Views */}
+      <div>
+        {activeTab === 'orders' && (
+          <SalesOrderList
+            onNewOrder={handleOpenCreate}
+            onSelectOrder={handleSelectOrder}
+            onPrintOrder={handlePrintOrder}
+            onDispatchOrder={handleDispatchOrder}
+            onAdvancePayment={(order) => setSelectedOrderForDetail(order)}
+            onCancelOrder={(order) => updateSalesOrderStatus(order.id, 'cancelled')}
+          />
+        )}
 
-            <form onSubmit={handleCreateOrder} className="p-6 overflow-y-auto space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-ink mb-1">Customer</label>
-                  <select
-                    required
-                    value={selectedCustomerId}
-                    onChange={(e) => setSelectedCustomerId(e.target.value)}
-                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
-                  >
-                    <option value="">Select customer...</option>
-                    {customers.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
+        {activeTab === 'dispatch' && (
+          <DeliveryDispatchList
+            onNewDispatch={() => {
+              setSelectedOrderForDispatch(null);
+              setIsDispatchModalOpen(true);
+            }}
+          />
+        )}
 
-                <div>
-                  <label className="block text-xs font-medium text-ink mb-1">Customer PO number</label>
-                  <input
-                    type="text"
-                    required
-                    value={customerPoNo}
-                    onChange={(e) => setCustomerPoNo(e.target.value)}
-                    placeholder="e.g. TML/CVBU/882"
-                    className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink font-mono"
-                  />
-                </div>
-              </div>
+        {activeTab === 'invoices' && (
+          <SalesInvoiceList />
+        )}
 
-              <div>
-                <label className="block text-xs font-medium text-ink mb-1">Target delivery date</label>
-                <input
-                  type="date"
-                  value={deliveryDate}
-                  onChange={(e) => setDeliveryDate(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
-                />
-              </div>
+        {activeTab === 'dashboard' && (
+          <SalesDashboard
+            onNewOrder={handleOpenCreate}
+            onViewOrders={() => setActiveTab('orders')}
+            onSelectOrder={handleSelectOrder}
+          />
+        )}
+      </div>
 
-              {/* Order Items */}
-              <div className="space-y-2 pt-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-ink">Manufactured parts</span>
-                  <button
-                    type="button"
-                    onClick={handleAddItemRow}
-                    className="text-xs text-ink-muted hover:text-ink font-medium"
-                  >
-                    + Add line
-                  </button>
-                </div>
+      {/* Sales Order Modal */}
+      <SalesOrderFormModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={(order) => {
+          setIsCreateModalOpen(false);
+          setSelectedOrderForDetail(order);
+        }}
+      />
 
-                {orderItems.map((oi, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 bg-canvas p-2 rounded border border-hairline">
-                    <div className="col-span-6">
-                      <select
-                        required
-                        value={oi.itemId}
-                        onChange={(e) => handleItemChange(index, e.target.value)}
-                        className="w-full px-2 py-1 text-xs rounded bg-surface-1 border border-hairline text-ink"
-                      >
-                        <option value="">Select part...</option>
-                        {finishedGoods.map(fg => (
-                          <option key={fg.id} value={fg.id}>{fg.name}</option>
-                        ))}
-                      </select>
-                    </div>
+      {/* Sales Order Drawer */}
+      <SalesOrderDetailDrawer
+        order={selectedOrderForDetail}
+        isOpen={!!selectedOrderForDetail}
+        onClose={() => setSelectedOrderForDetail(null)}
+        onPrint={handlePrintOrder}
+        onDispatch={handleDispatchOrder}
+        onAdvancePayment={(order) => {
+          // Keep drawer open or handle advance modal
+        }}
+        onCancel={(order) => {
+          updateSalesOrderStatus(order.id, 'cancelled');
+          setSelectedOrderForDetail(null);
+        }}
+      />
 
-                    <div className="col-span-3">
-                      <input
-                        type="number"
-                        placeholder="Quantity"
-                        value={oi.quantity}
-                        onChange={(e) => {
-                          const updated = [...orderItems];
-                          updated[index].quantity = Number(e.target.value);
-                          setOrderItems(updated);
-                        }}
-                        className="w-full px-2 py-1 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono text-right"
-                      />
-                    </div>
+      {/* Print View Modal */}
+      <SalesOrderPrintView
+        order={selectedOrderForPrint}
+        isOpen={!!selectedOrderForPrint}
+        onClose={() => setSelectedOrderForPrint(null)}
+      />
 
-                    <div className="col-span-3">
-                      <input
-                        type="number"
-                        placeholder="Price (₹)"
-                        value={oi.unitPrice}
-                        onChange={(e) => {
-                          const updated = [...orderItems];
-                          updated[index].unitPrice = Number(e.target.value);
-                          setOrderItems(updated);
-                        }}
-                        className="w-full px-2 py-1 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono text-right"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-ink mb-1">Notes</label>
-                <textarea
-                  value={orderNotes}
-                  onChange={(e) => setOrderNotes(e.target.value)}
-                  placeholder="Packaging specifications or heat treatment instructions..."
-                  rows={2}
-                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink focus:outline-none focus:border-ink"
-                />
-              </div>
-
-              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-hairline">
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="btn-tertiary text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary text-xs"
-                >
-                  Confirm order
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* DISPATCH CHALLAN MODAL */}
-      {selectedOrderForChallan && (
-        <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-surface-1 border border-hairline rounded-xl w-full max-w-md overflow-hidden flex flex-col shadow-lift">
-            <div className="px-6 py-4 border-b border-hairline flex items-center justify-between">
-              <h2 className="text-sm font-medium text-ink">
-                Dispatch delivery challan
-              </h2>
-              <button
-                onClick={() => setSelectedOrderForChallan(null)}
-                className="p-1 rounded text-ink-subtle hover:text-ink"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleGenerateChallan} className="p-6 space-y-4">
-              <div className="p-3 rounded bg-canvas border border-hairline text-xs space-y-1">
-                <div className="font-medium text-ink">Order: {selectedOrderForChallan.soNumber}</div>
-                <div className="text-ink-muted">Recipient: {selectedOrderForChallan.customerName}</div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-ink mb-1">Transporter</label>
-                <input
-                  type="text"
-                  required
-                  value={transporter}
-                  onChange={(e) => setTransporter(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-ink mb-1">Vehicle number</label>
-                <input
-                  type="text"
-                  required
-                  value={vehicleNo}
-                  onChange={(e) => setVehicleNo(e.target.value)}
-                  placeholder="MH 12 RN 8845"
-                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-ink mb-1">E-Way bill number</label>
-                <input
-                  type="text"
-                  required
-                  value={eWayBill}
-                  onChange={(e) => setEWayBill(e.target.value)}
-                  placeholder="12-digit number"
-                  className="w-full px-2.5 py-1.5 text-xs rounded bg-surface-1 border border-hairline text-ink font-mono"
-                />
-              </div>
-
-              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-hairline">
-                <button
-                  type="button"
-                  onClick={() => setSelectedOrderForChallan(null)}
-                  className="btn-tertiary text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary text-xs"
-                >
-                  Generate challan
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Dispatch Modal */}
+      <DeliveryDispatchModal
+        isOpen={isDispatchModalOpen}
+        onClose={() => {
+          setIsDispatchModalOpen(false);
+          setSelectedOrderForDispatch(null);
+        }}
+        order={selectedOrderForDispatch}
+        onSuccess={() => {
+          setIsDispatchModalOpen(false);
+          setSelectedOrderForDispatch(null);
+          setActiveTab('dispatch');
+        }}
+      />
     </div>
   );
 };

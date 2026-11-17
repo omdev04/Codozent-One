@@ -1,6 +1,6 @@
-# FactoryFlow ERP - Integrated Manufacturing Solution (Small Factories)
+# Codozent-One
 
-A modern, cloud-native ERP platform built for small manufacturing units (10–100 employees) in the Chakan–Pune industrial belt (CNC machining, auto components, stamping, sheet metal, and light assembly).
+A modern, cloud-native ERP and SaaS platform built for multi-tenant manufacturing operations, featuring global Super Admin command center, modular enterprise architecture, and production-grade industrial workflows.
 
 Built following the **FactoryFlow PRD specification** and styled according to the design system in [DESIGN.md](file:///d:/maketoO/DESIGN.md).
 

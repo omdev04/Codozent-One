@@ -1,0 +1,238 @@
+{
+  "companies": [
+    {
+      "id": "comp-mwiwyu08",
+      "name": "Om Shukla's Industrial Works",
+      "code": "INDW",
+      "gstin": "27AAACP0123M1Z5",
+      "pan": "AAACP0123M",
+      "address": "Industrial Corridor, MIDC",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "stateCode": "27",
+      "pincode": "411026",
+      "phone": "+91 20 2712 0000",
+      "email": "oms976346@gmail.com",
+      "currency": "INR",
+      "industry": "Precision Engineering & Manufacturing"
+    },
+    {
+      "id": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "name": "Codozent One Corp",
+      "code": "COC",
+      "gstin": "",
+      "pan": "QGRPS9692K",
+      "address": "147, Pune chakan highway",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "stateCode": "27",
+      "pincode": "411001",
+      "phone": "+91 7666518073",
+      "email": "omshukla004@gmail.com",
+      "currency": "INR",
+      "industry": "CNC Machining & Precision Turning"
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-mwiwyu08",
+      "companyId": "comp-mwiwyu08",
+      "name": "Om Shukla",
+      "email": "oms976346@gmail.com",
+      "role": "owner",
+      "department": "Executive Management",
+      "isActive": true,
+      "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocJcSuZojjo9rW_OR9g3RmbbBltgwGMPkmo1Scd9GqOqSPZKZw=s96-c"
+    },
+    {
+      "id": "82651935-0857-4c66-a35a-a910b66bc77b",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "name": "om shukla",
+      "email": "omshukla004@gmail.com",
+      "phone": "+91 7666518073",
+      "role": "owner",
+      "department": "Executive Management",
+      "isActive": true,
+      "isEmailVerified": true,
+      "verificationStatus": "active"
+    }
+  ],
+  "warehouses": [],
+  "items": [],
+  "boms": [],
+  "workCenters": [
+    {
+      "id": "wc-cut-comp-mwiwyu08",
+      "companyId": "comp-mwiwyu08",
+      "code": "WC-LASER-01",
+      "name": "CNC Laser Cutting Machine",
+      "hourlyRate": 1200,
+      "capacityHoursPerDay": 16,
+      "location": "Shop Floor - Bay A",
+      "status": "active",
+      "qrCode": "QR-WC-LASER-01-comp-mwiwyu08"
+    },
+    {
+      "id": "wc-weld-comp-mwiwyu08",
+      "companyId": "comp-mwiwyu08",
+      "code": "WC-MIG-02",
+      "name": "MIG Welding Station",
+      "hourlyRate": 600,
+      "capacityHoursPerDay": 16,
+      "location": "Shop Floor - Bay B",
+      "status": "active",
+      "qrCode": "QR-WC-MIG-02-comp-mwiwyu08"
+    },
+    {
+      "id": "wc-paint-comp-mwiwyu08",
+      "companyId": "comp-mwiwyu08",
+      "code": "WC-PAINT-03",
+      "name": "Painting & Powder Coating Booth",
+      "hourlyRate": 800,
+      "capacityHoursPerDay": 12,
+      "location": "Finishing Section - Bay C",
+      "status": "active",
+      "qrCode": "QR-WC-PAINT-03-comp-mwiwyu08"
+    },
+    {
+      "id": "wc-cut-eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "code": "WC-LASER-01",
+      "name": "CNC Laser Cutting Machine",
+      "hourlyRate": 1200,
+      "capacityHoursPerDay": 16,
+      "location": "Shop Floor - Bay A",
+      "status": "active",
+      "qrCode": "QR-WC-LASER-01-eb12ef03-4347-4403-bd00-fac31ea46cc7"
+    },
+    {
+      "id": "wc-weld-eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "code": "WC-MIG-02",
+      "name": "MIG Welding Station",
+      "hourlyRate": 600,
+      "capacityHoursPerDay": 16,
+      "location": "Shop Floor - Bay B",
+      "status": "active",
+      "qrCode": "QR-WC-MIG-02-eb12ef03-4347-4403-bd00-fac31ea46cc7"
+    },
+    {
+      "id": "wc-paint-eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "code": "WC-PAINT-03",
+      "name": "Painting & Powder Coating Booth",
+      "hourlyRate": 800,
+      "capacityHoursPerDay": 12,
+      "location": "Finishing Section - Bay C",
+      "status": "active",
+      "qrCode": "QR-WC-PAINT-03-eb12ef03-4347-4403-bd00-fac31ea46cc7"
+    }
+  ],
+  "rfqs": [],
+  "customers": [],
+  "suppliers": [],
+  "quotations": [],
+  "salesOrders": [],
+  "purchaseOrders": [],
+  "grns": [],
+  "workOrders": [],
+  "productionEntries": [],
+  "qualityInspections": [],
+  "stockTransactions": [],
+  "invoices": [],
+  "payments": [],
+  "deliveryChallans": [],
+  "chartOfAccounts": [],
+  "ledgerEntries": [],
+  "auditLogs": [],
+  "sequences": {},
+  "leads": [],
+  "crmActivities": [],
+  "crmFollowups": [],
+  "crmDocuments": [],
+  "projects": [],
+  "tasks": [],
+  "khataEntries": [],
+  "gst2bRecords": [],
+  "caQueries": [],
+  "counterSales": [],
+  "employees": [],
+  "attendance": [],
+  "payrolls": [],
+  "tickets": [],
+  "purchaseRequisitions": [],
+  "vendorQuotations": [],
+  "purchaseBills": [],
+  "tradeActivities": [],
+  "tenants": [],
+  "branches": [],
+  "companyModules": [
+    {
+      "id": "cmod-mwiy1v6i-ovhd",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "crm",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.042Z"
+    },
+    {
+      "id": "cmod-mwiy1v6i-tcyv",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "quotations",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.042Z"
+    },
+    {
+      "id": "cmod-mwiy1v6j-8ulq",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "sales",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.043Z"
+    },
+    {
+      "id": "cmod-mwiy1v6j-v7ce",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "purchase",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.043Z"
+    },
+    {
+      "id": "cmod-mwiy1v6j-iag1",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "inventory",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.043Z"
+    },
+    {
+      "id": "cmod-mwiy1v6j-kj3d",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "manufacturing",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.043Z"
+    },
+    {
+      "id": "cmod-mwiy1v6k-nd6l",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "finance",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.044Z"
+    },
+    {
+      "id": "cmod-mwiy1v6k-g0qj",
+      "companyId": "eb12ef03-4347-4403-bd00-fac31ea46cc7",
+      "moduleId": "reports",
+      "status": "enabled",
+      "settings": {},
+      "updatedAt": "2026-11-16T07:30:30.044Z"
+    }
+  ],
+  "roles": [],
+  "rolePermissions": [],
+  "userRoleAssignments": []
+}
